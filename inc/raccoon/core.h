@@ -79,10 +79,11 @@ enum RaccoonStatus {
 };
 #undef X
 
-/** Returns a prisma error string from prisma error code
-    @param e prisma error code
-    @returns C string upon success, `NULL` otherwise
-*/
+/**
+ * @brief  Returns a Raccoon error string from prisma error code
+ * @param  e raccoon error code
+ * @returns C string upon success, `NULL` otherwise
+ */
 extern const char *rac_status_to_str(const enum RaccoonStatus e);
 
 #endif // RACCOON_CORE_H

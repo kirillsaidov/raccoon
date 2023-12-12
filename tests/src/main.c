@@ -33,8 +33,13 @@ void test_var(void) {
     assert(var0->backward == NULL);
     rac_var_free(var0);
 
-    // start anew
+    // operations
     rac_var_t *var1 = rac_var_make(alloctr, 1);
 
+
+    // zero grad
+    // var1->grad = 1;
+    // rac_var_zero_grad(var1);
+    // assert(var1->grad == 0);
 }
 
