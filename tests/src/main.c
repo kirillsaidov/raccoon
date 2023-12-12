@@ -160,10 +160,10 @@ void test_var(void) {
     rac_var_t *e = rac_var_mul(a, b);
     rac_var_t *d = rac_var_add(e, c);
     rac_var_t *f = rac_var_make(alloctr, -2);
-    rac_var_t *h = rac_var_mul(f, d);
+    rac_var_t *g = rac_var_mul(f, d);
 
     // check values
-    assert(h->data == -8);
+    assert(g->data == -8);
     assert(f->data == -2);
     assert(d->data == 4);
     assert(e->data == -6);
@@ -172,7 +172,7 @@ void test_var(void) {
     assert(a->data == 2);
 
     // check grad
-    assert(h->grad == 0);
+    assert(g->grad == 0);
     assert(f->grad == 0);
     assert(d->grad == 0);
     assert(e->grad == 0);
@@ -181,15 +181,34 @@ void test_var(void) {
     assert(a->grad == 0);
 
     // backward
-    rac_var_backward(h);
+    rac_var_backward(g);
 
     // check grad after backward
-    assert(h->grad == 1);
+    assert(g->grad == 1);
     assert(f->grad == 4);
     assert(d->grad == -2);
     assert(e->grad == -2);
     assert(c->grad == -2);
     assert(b->grad == -4);
     assert(a->grad == 6);
+
+    // zero grad
+    rac_var_zero_grad(g);
+    assert(g->grad == 0);
+    assert(f->grad == 0);
+    assert(d->grad == 0);
+    assert(e->grad == 0);
+    assert(c->grad == 0);
+    assert(b->grad == 0);
+    assert(a->grad == 0);
+
+    // free
+    rac_var_free(a);
+    rac_var_free(b);
+    rac_var_free(c);
+    rac_var_free(d);
+    rac_var_free(e);
+    rac_var_free(f);
+    rac_var_free(g);
 }
 
