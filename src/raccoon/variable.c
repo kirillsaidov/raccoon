@@ -1,7 +1,7 @@
 #include "raccoon/variable.h"
 
-vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start);
-void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node_list);
+static vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start);
+static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node_list);
 
 /* 
     Variable creation/destruction
@@ -67,7 +67,7 @@ void rac_var_backward(rac_var_t *const var) {
     const size_t len = vt_plist_len(node_list);
     VT_FOREACH(i, 0, len) {
         rac_var_t *node = vt_plist_get(node_list, i);
-        node->backward(node);
+        if (node->backward) node->backward(node);
     }
 
     // free parent tree
@@ -127,7 +127,7 @@ rac_var_t *rac_var_div(rac_var_t *const lhs, rac_var_t *const rhs) {
 
 // -------------------------- PRIVATE -------------------------- //
 
-vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start) {
+static vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start) {
     // check for invalid input
     VT_DEBUG_ASSERT(node_start != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
 
@@ -140,7 +140,7 @@ vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start) {
     return node_list;
 }
 
-void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node_list) {
+static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node_list) {
     // check for invalid input
     VT_DEBUG_ASSERT(node_list != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
 
