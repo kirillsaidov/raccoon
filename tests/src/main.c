@@ -299,7 +299,7 @@ void test_neuron(void) {
 
         // print progress
         if (epoch % 1 == 0) {
-            printf("step %zu loss %.2f lr %.2f\n", epoch, cost->data, lr);
+            printf("step %zu loss %.2f lr %.2f\n", epoch, cost_data, lr);
             printf("w0: %.2f | grad: %.2f\n", ((rac_var_t*)vt_plist_get(params, 0))->data, ((rac_var_t*)vt_plist_get(params, 0))->grad);
             printf("w1: %.2f | grad: %.2f\n", ((rac_var_t*)vt_plist_get(params, 1))->data, ((rac_var_t*)vt_plist_get(params, 1))->grad);
             printf("b : %.2f | grad: %.2f\n\n", ((rac_var_t*)vt_plist_get(params, 2))->data, ((rac_var_t*)vt_plist_get(params, 2))->grad);
@@ -315,7 +315,7 @@ void test_neuron(void) {
     assert(((rac_var_t*)vt_plist_get(params, 0))->grad == 0);
     assert(((rac_var_t*)vt_plist_get(params, 1))->grad == 0);
 
-    // free
+    // free only the things you've allocated yourself
     rac_var_free(loss);
     rac_var_free(target);
     plist_var_free(input);
