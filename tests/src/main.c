@@ -43,7 +43,7 @@ void test_var(void) {
     assert(c->data == 3);
     assert(c->grad == 0);
     assert(c->parents[0] == a && c->parents[1] == b);
-    assert(c->backward == rac_op_backward_add);
+    assert(c->backward != NULL);
 
     // backward
     rac_var_backward(c);
@@ -72,7 +72,7 @@ void test_var(void) {
     assert(c->data == 5);
     assert(c->grad == 0);
     assert(c->parents[0] == a && c->parents[1] == b);
-    assert(c->backward == rac_op_backward_add);
+    assert(c->backward != NULL);
 
     // backward
     rac_var_backward(c);
@@ -101,7 +101,7 @@ void test_var(void) {
     assert(c->data == 6);
     assert(c->grad == 0);
     assert(c->parents[0] == a && c->parents[1] == b);
-    assert(c->backward == rac_op_backward_mul);
+    assert(c->backward != NULL);
 
     // backward
     rac_var_backward(c);
@@ -130,7 +130,7 @@ void test_var(void) {
     assert(c->data == 2);
     assert(c->grad == 0);
     assert(c->parents[0] == a && c->parents[1] == b);
-    assert(c->backward == rac_op_backward_mul);
+    assert(c->backward != NULL);
 
     // backward
     rac_var_backward(c);

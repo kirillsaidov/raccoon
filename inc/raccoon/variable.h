@@ -7,9 +7,9 @@
 */
 
 #include "raccoon/core.h"
-#include "raccoon/op_backward.h"
 #include "vita/container/plist.h"
 
+// parent node length (there can only be two parents at a time)
 #define RAC_VAR_PARENTS_LEN 2
 
 // Variable with autograd functionality

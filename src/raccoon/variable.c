@@ -2,6 +2,8 @@
 
 static vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start);
 static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node_list);
+static void rac_var_add_backward(rac_var_t *const op_result);
+static void rac_var_mul_backward(rac_var_t *const op_result);
 
 /* 
     Variable creation/destruction
@@ -100,30 +102,29 @@ rac_var_t *rac_var_add(rac_var_t *const lhs, rac_var_t *const rhs) {
     // check for invalid input
     VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     VT_DEBUG_ASSERT(rhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
-    return rac_var_make_ex(lhs->alloctr, lhs->data + rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_op_backward_add);
+    return rac_var_make_ex(lhs->alloctr, lhs->data + rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_add_backward);
 }
 
 rac_var_t *rac_var_sub(rac_var_t *const lhs, rac_var_t *const rhs) {
     // check for invalid input
     VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     VT_DEBUG_ASSERT(rhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
-    return rac_var_make_ex(lhs->alloctr, lhs->data - rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_op_backward_add);
+    return rac_var_make_ex(lhs->alloctr, lhs->data - rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_add_backward);
 }
 
 rac_var_t *rac_var_mul(rac_var_t *const lhs, rac_var_t *const rhs) {
     // check for invalid input
     VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     VT_DEBUG_ASSERT(rhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
-    return rac_var_make_ex(lhs->alloctr, lhs->data * rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_op_backward_mul);
+    return rac_var_make_ex(lhs->alloctr, lhs->data * rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_mul_backward);
 }
 
 rac_var_t *rac_var_div(rac_var_t *const lhs, rac_var_t *const rhs) {
     // check for invalid input
     VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     VT_DEBUG_ASSERT(rhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
-    return rac_var_make_ex(lhs->alloctr, lhs->data / rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_op_backward_mul);
+    return rac_var_make_ex(lhs->alloctr, lhs->data / rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_mul_backward);
 }
-
 
 // -------------------------- PRIVATE -------------------------- //
 
@@ -152,5 +153,31 @@ static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node
 
     // traverse each parent node iteratively
     VT_FOREACH(i, 0, RAC_VAR_PARENTS_LEN) rac_var_deep_walk(node_curr->parents[i], node_list);
+}
+
+static void rac_var_add_backward(rac_var_t *const op_result) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(op_result != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+
+    // get lhs, rhs
+    rac_var_t *const lhs = op_result->parents[0];
+    rac_var_t *const rhs = op_result->parents[1];
+
+    // perform backward operation
+    lhs->grad += 1.0 * op_result->grad;
+    rhs->grad += 1.0 * op_result->grad;
+}
+
+static void rac_var_mul_backward(rac_var_t *const op_result) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(op_result != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+
+    // get lhs, rhs
+    rac_var_t *const lhs = op_result->parents[0];
+    rac_var_t *const rhs = op_result->parents[1];
+
+    // perform backward operation
+    lhs->grad += rhs->data * op_result->grad;
+    rhs->grad += lhs->data * op_result->grad;
 }
 
