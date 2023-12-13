@@ -320,7 +320,7 @@ void test_neuron(void) {
     rac_var_free(target);
     plist_var_free(input);
     rac_neuron_free(perceptron);
-    // plist_var_free(params);  // no need to free, is freed by the neuron, since it was given to it as a parameter
+    // plist_var_free(params);  // no need to free, is freed by the neuron, since it was passed in as a parameter
     // rac_var_free(pred);      // no need to free, is freed by the neuron, since it was allocated by it
 }
 

@@ -2,8 +2,8 @@
 This is a small autograd library made for educational purposes, but works for real use cases as well! Inspired by the [Micrograd](https://github.com/karpathy/micrograd) engine.
 
 ## Features
-* [Variable](inc/raccoon/core/variable.h#L24) data type with automatic gradient calculation
-* [Neuron](inc/raccoon/nn/neuron.h#L13) data type (perceptron model)
+* [Variable](inc/raccoon/core/variable.h#L25) data type with automatic gradient calculation
+* [Neuron](inc/raccoon/nn/neuron.h#L18) data type (perceptron model)
 * To-do: layer
 * To-do: ANN
 
@@ -17,11 +17,11 @@ $ cd raccoon
 $ git submodule update --init --recursive
 
 # build raccoon and its dependencies
-$ ./build.sh # linux, osx
+$ ./build.sh  # linux, osx
 $ ./build.bat # windows
 
 # test it out (compiles and executes tests/src/main.c)
-$ sh test.sh
+$ ./test.sh
 ```
 Take a look at [`tests/Makefile`](tests/Makefile) to configure your build system.
 
