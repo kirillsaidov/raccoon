@@ -12,6 +12,7 @@
     - rac_var_sub
     - rac_var_mul
     - rac_var_div
+    - rac_var_build_parent_tree
 */
 
 #include "raccoon/core/core.h"

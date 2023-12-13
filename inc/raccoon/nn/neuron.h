@@ -3,7 +3,12 @@
 
 /** NEURON MODULE
  * Functions:
-    - //
+    - rac_neuron_make
+    - rac_neuron_make_ex
+    - rac_neuron_free
+    - rac_neuron_forward
+    - rac_neuron_zero_grad
+    - rac_neuron_update
 */
 
 #include "raccoon/core/core.h"
