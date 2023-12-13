@@ -2,7 +2,6 @@
 #define RACCOON_VERSION_H
 
 /** VERSION MODULE
- * This module describes library version.
  * Functions:
     - rac_version_get
 */

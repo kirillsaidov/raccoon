@@ -3,7 +3,15 @@
 
 /** VARIABLE MODULE
  * Functions:
-    - //
+    - rac_var_make
+    - rac_var_make_ex
+    - rac_var_free
+    - rac_var_backward
+    - rac_var_zero_grad
+    - rac_var_add
+    - rac_var_sub
+    - rac_var_mul
+    - rac_var_div
 */
 
 #include "raccoon/core.h"
