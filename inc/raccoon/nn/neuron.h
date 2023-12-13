@@ -12,7 +12,10 @@
 // Neuron with weights + bias (perceptron)
 typedef struct RaccoonNeuron {
     // model parameters: weights + bias
-    vt_plist_t *params; 
+    vt_plist_t *params;
+
+    // model cache: by-product allocations (neuron keeps track of all allocations it makes and frees it)
+    vt_plist_t *cache;
 
     // activation funtions (it must set the backward function to be used in backward propagation)
     rac_var_t *(*activate)(rac_var_t *const);
@@ -68,6 +71,14 @@ extern rac_var_t *rac_neuron_forward(rac_neuron_t *const neuron, const vt_plist_
  * @returns None
  */
 extern void rac_neuron_zero_grad(rac_neuron_t *const neuron);
+
+/**
+ * @brief  Update neuron parameters
+ * @param  neuron instance
+ * @param  lr learning rate
+ * @returns None
+ */
+extern void rac_neuron_update(rac_neuron_t *const neuron, const rac_float lr);
 
 #endif // RACCOON_NN_NEURON_H
 

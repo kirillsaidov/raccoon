@@ -1,10 +1,20 @@
 #include "raccoon/raccoon.h"
+#include "vita/vita.h"
 
+// test suite
 static int test_num = 0;
 #define TEST(func) { printf("(%d) ---> TESTING: %s\n", test_num, #func); func(); test_num++; }
 
+/**
+ * TESTING
+ */
 void test_var(void);
 void test_neuron(void);
+
+/**
+ * HELPER FUNCTIONS
+ */
+void plist_var_free(vt_plist_t *list);
 
 static vt_mallocator_t *alloctr = NULL;
 int main(void) {
@@ -16,7 +26,7 @@ int main(void) {
     // start
     alloctr = vt_mallocator_create();
     {
-        // vt_debug_disable_output(true);
+        vt_debug_disable_output(true);
         // TEST(test_var);
         TEST(test_neuron);
     }
@@ -215,6 +225,113 @@ void test_var(void) {
 }
 
 void test_neuron(void) {
-    //
+    // allocate, test, free
+    const size_t input_size = 2;
+    rac_neuron_t *perceptron = rac_neuron_make(alloctr, input_size, NULL);
+    assert(perceptron->params != NULL);
+    assert(perceptron->cache != NULL);
+    assert(perceptron->activate == NULL);
+    assert(vt_plist_len(perceptron->params) == input_size+1);
+    assert(vt_plist_capacity(perceptron->cache) == 2*(input_size+1)+2);
+    rac_neuron_free(perceptron);
+
+    /**
+     * FORWARD PROPAGATION
+     */
+
+    // input
+    rac_var_t *target = rac_var_make(alloctr, 4);
+    vt_plist_t *input = vt_plist_create(input_size, alloctr);
+    vt_plist_push_back(input, rac_var_make(alloctr, 1)); // x1
+    vt_plist_push_back(input, rac_var_make(alloctr, 2)); // x2
+
+    // params
+    vt_plist_t *params = vt_plist_create(input_size+1, alloctr);
+    vt_plist_push_back(params, rac_var_make(alloctr, 0.5)); // w1
+    vt_plist_push_back(params, rac_var_make(alloctr, 0.5)); // w2
+    vt_plist_push_back(params, rac_var_make(alloctr, 0.5)); // b
+
+    // y = w1 * x1 + w2 * x2 + b
+    perceptron = rac_neuron_make_ex(alloctr, params, NULL);
+    assert(perceptron->params != NULL);
+    assert(perceptron->cache != NULL);
+    assert(perceptron->activate == NULL);
+    assert(vt_plist_len(perceptron->params) == input_size+1);
+    assert(vt_plist_capacity(perceptron->cache) == 2*(input_size+1)+2);
+
+    // forward
+    rac_var_t *pred = rac_neuron_forward(perceptron, input);
+    assert(pred->data == 2);
+
+    // loss
+    rac_var_t *loss = rac_var_sub(target, pred);
+    assert(loss->data == 2);
+
+    // backward
+    rac_var_backward(loss);
+    assert(((rac_var_t*)vt_plist_get(params, 0))->grad == ((rac_var_t*)vt_plist_get(input, 0))->data);
+    assert(((rac_var_t*)vt_plist_get(params, 1))->grad == ((rac_var_t*)vt_plist_get(input, 1))->data);
+    assert(((rac_var_t*)vt_plist_get(params, 2))->grad == 1);
+
+    // loop
+    const size_t iters = 100;
+    VT_FOREACH(epoch, 0, iters) {
+        // forward
+        rac_var_t *yhat = rac_neuron_forward(perceptron, input);
+
+        // loss
+        rac_var_t *cost = rac_var_sub(yhat, target);
+
+        // backward
+        rac_neuron_zero_grad(perceptron);
+        rac_var_backward(cost);
+
+        // update
+        const rac_float lr = 0.05;
+        const rac_float cost_data = cost->data;
+        rac_neuron_update(perceptron, lr * cost->data);
+
+        // free cost
+        rac_var_free(cost);
+
+        // stop
+        if (cost_data > -0.01 && cost_data < 0.01) break;
+
+        // print progress
+        if (epoch % 1 == 0) {
+            printf("step %zu loss %.2f lr %.2f\n", epoch, cost->data, lr);
+            printf("w0: %.2f | grad: %.2f\n", ((rac_var_t*)vt_plist_get(params, 0))->data, ((rac_var_t*)vt_plist_get(params, 0))->grad);
+            printf("w1: %.2f | grad: %.2f\n", ((rac_var_t*)vt_plist_get(params, 1))->data, ((rac_var_t*)vt_plist_get(params, 1))->grad);
+            printf("b : %.2f | grad: %.2f\n\n", ((rac_var_t*)vt_plist_get(params, 2))->data, ((rac_var_t*)vt_plist_get(params, 2))->grad);
+        }
+    }
+
+    // test model
+    pred = rac_neuron_forward(perceptron, input);
+    assert(vt_math_is_close(pred->data, 4, 0.01));
+
+    // zero grad
+    rac_neuron_zero_grad(perceptron);
+    assert(((rac_var_t*)vt_plist_get(params, 0))->grad == 0);
+    assert(((rac_var_t*)vt_plist_get(params, 1))->grad == 0);
+
+    // free
+    rac_var_free(loss);
+    rac_var_free(target);
+    plist_var_free(input);
+    rac_neuron_free(perceptron);
+    // plist_var_free(params);  // no need to free, is freed by the neuron, since it was given to it as a parameter
+    // rac_var_free(pred);      // no need to free, is freed by the neuron, since it was allocated by it
+}
+
+// frees plist and its contents
+void plist_var_free(vt_plist_t *list) {
+    assert(list != NULL);
+
+    // free list contents
+    VT_FOREACH(i, 0, vt_plist_len(list)) rac_var_free(vt_plist_get(list, i));
+
+    // free list itself
+    vt_plist_destroy(list);
 }
 
