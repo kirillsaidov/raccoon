@@ -1,5 +1,5 @@
-#ifndef RACCOON_VARIABLE_H
-#define RACCOON_VARIABLE_H
+#ifndef RACCOON_CORE_VARIABLE_H
+#define RACCOON_CORE_VARIABLE_H
 
 /** VARIABLE MODULE
  * Functions:
@@ -68,7 +68,7 @@ extern rac_var_t *rac_var_make_ex(struct VitaBaseAllocatorType *const alloctr, c
 extern void rac_var_free(rac_var_t *var);
 
 /* 
-    Variable functionality
+    Variable operations
 */
 
 /**
@@ -84,10 +84,6 @@ extern void rac_var_backward(rac_var_t *const var);
  * @returns None
  */
 extern void rac_var_zero_grad(rac_var_t *const var);
-
-/* 
-    Variable operations
-*/
 
 /**
  * @brief  Add two variables
@@ -120,5 +116,16 @@ extern rac_var_t *rac_var_mul(rac_var_t *const lhs, rac_var_t *const rhs);
  */
 extern rac_var_t *rac_var_div(rac_var_t *const lhs, rac_var_t *const rhs);
 
-#endif // RACCOON_VARIABLE_H
+/* 
+    Other
+*/
+
+/**
+ * @brief  Builds parent (dependency) tree
+ * @param  node_start start from node
+ * @returns a list of parents including the starting node or asserts on failure
+ */
+extern vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start);
+
+#endif // RACCOON_CORE_VARIABLE_H
 

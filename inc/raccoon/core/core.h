@@ -66,7 +66,6 @@ typedef RAC_FLOAT rac_float;
     apply(RAC_STATUS_ERROR_INVALID_ARGUMENTS)        /* invalid arguments supplied */ \
     apply(RAC_STATUS_ERROR_OUT_OF_BOUNDS_ACCESS)     /* accessing memory beyond allocated size */ \
     apply(RAC_STATUS_ERROR_INCOMPATIBLE_SHAPES)      /* incompatible tensor shape */ \
-    apply(RAC_STATUS_ERROR_INCOMPATIBLE_DIMENSIONS)  /* different dimensions */ \
     apply(RAC_STATUS_OPERATION_FAILURE)              /* failed to perform an action */ \
     apply(RAC_STATUS_OPERATION_SUCCESS)              /* all good */ \
     apply(RAC_STATUS_COUNT)                          /* number of elements */

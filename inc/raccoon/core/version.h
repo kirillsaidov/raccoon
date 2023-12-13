@@ -1,5 +1,5 @@
-#ifndef RACCOON_VERSION_H
-#define RACCOON_VERSION_H
+#ifndef RACCOON_CORE_VERSION_H
+#define RACCOON_CORE_VERSION_H
 
 /** VERSION MODULE
  * Functions:
@@ -19,5 +19,5 @@
 */
 extern vt_version_t rac_version_get(void);
 
-#endif // RACCOON_VERSION_H
+#endif // RACCOON_CORE_VERSION_H
 

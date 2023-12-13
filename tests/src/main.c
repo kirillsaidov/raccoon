@@ -4,6 +4,7 @@ static int test_num = 0;
 #define TEST(func) { printf("(%d) ---> TESTING: %s\n", test_num, #func); func(); test_num++; }
 
 void test_var(void);
+void test_neuron(void);
 
 static vt_mallocator_t *alloctr = NULL;
 int main(void) {
@@ -16,7 +17,8 @@ int main(void) {
     alloctr = vt_mallocator_create();
     {
         // vt_debug_disable_output(true);
-        TEST(test_var);
+        // TEST(test_var);
+        TEST(test_neuron);
     }
     vt_mallocator_print_stats(alloctr->stats);
     vt_mallocator_destroy(alloctr);
@@ -210,5 +212,9 @@ void test_var(void) {
     rac_var_free(e);
     rac_var_free(f);
     rac_var_free(g);
+}
+
+void test_neuron(void) {
+    //
 }
 

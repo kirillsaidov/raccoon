@@ -1,6 +1,5 @@
 #include "raccoon/core/variable.h"
 
-static vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start);
 static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node_list);
 static void rac_var_add_backward(rac_var_t *const op_result);
 static void rac_var_mul_backward(rac_var_t *const op_result);
@@ -52,7 +51,7 @@ void rac_var_free(rac_var_t *var) {
 }
 
 /* 
-    Variable functionality
+    Variable operations
 */
 
 void rac_var_backward(rac_var_t *const var) {
@@ -94,10 +93,6 @@ void rac_var_zero_grad(rac_var_t *const var) {
     vt_plist_destroy(node_list);
 }
 
-/* 
-    Variable operations
-*/
-
 rac_var_t *rac_var_add(rac_var_t *const lhs, rac_var_t *const rhs) {
     // check for invalid input
     VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
@@ -126,9 +121,7 @@ rac_var_t *rac_var_div(rac_var_t *const lhs, rac_var_t *const rhs) {
     return rac_var_make_ex(lhs->alloctr, lhs->data / rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_mul_backward);
 }
 
-// -------------------------- PRIVATE -------------------------- //
-
-static vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start) {
+vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start) {
     // check for invalid input
     VT_DEBUG_ASSERT(node_start != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
 
@@ -141,6 +134,14 @@ static vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start) {
     return node_list;
 }
 
+// -------------------------- PRIVATE -------------------------- //
+
+/**
+ * @brief  Builds parent (dependency) tree
+ * @param  node_curr current node
+ * @param  node_list node list
+ * @returns None
+ */
 static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node_list) {
     // check for invalid input
     VT_DEBUG_ASSERT(node_list != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
@@ -155,6 +156,11 @@ static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node
     VT_FOREACH(i, 0, RAC_VAR_PARENTS_LEN) rac_var_deep_walk(node_curr->parents[i], node_list);
 }
 
+/**
+ * @brief  Performs backward operation on addition and substraction
+ * @param  op_result addition/substraction operation result
+ * @returns None
+ */
 static void rac_var_add_backward(rac_var_t *const op_result) {
     // check for invalid input
     VT_DEBUG_ASSERT(op_result != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
@@ -168,6 +174,11 @@ static void rac_var_add_backward(rac_var_t *const op_result) {
     rhs->grad += 1.0 * op_result->grad;
 }
 
+/**
+ * @brief  Performs backward operation on multiplication and division
+ * @param  op_result multiplication/division operation result
+ * @returns None
+ */
 static void rac_var_mul_backward(rac_var_t *const op_result) {
     // check for invalid input
     VT_DEBUG_ASSERT(op_result != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
