@@ -1,4 +1,4 @@
-#include "raccoon/core.h"
+#include "raccoon/core/core.h"
 
 // generate prisma error strings
 #define X(a) VT_STRING_OF(a),

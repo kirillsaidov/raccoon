@@ -14,7 +14,7 @@
     - rac_var_div
 */
 
-#include "raccoon/core.h"
+#include "raccoon/core/core.h"
 #include "vita/container/plist.h"
 
 // parent node length (there can only be two parents at a time)

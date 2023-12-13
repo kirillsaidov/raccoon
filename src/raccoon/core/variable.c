@@ -1,4 +1,4 @@
-#include "raccoon/variable.h"
+#include "raccoon/core/variable.h"
 
 static vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start);
 static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node_list);

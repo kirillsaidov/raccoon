@@ -1,4 +1,4 @@
-#include "raccoon/version.h"
+#include "raccoon/core/version.h"
 
 vt_version_t rac_version_get(void) {
     return (vt_version_t) {
