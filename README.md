@@ -2,8 +2,8 @@
 This is a small autograd library made for educational purposes, but works for real use cases as well! Inspired by the [Micrograd](https://github.com/karpathy/micrograd) engine.
 
 ## Features
-* [Variable](inc/raccoon/core/variable.h#L25) data type with automatic gradient calculation
-* [Neuron](inc/raccoon/nn/neuron.h#L18) data type (perceptron model)
+* [Variable](inc/raccoon/core/variable.h#L25) data type with autograd
+* [Neuron](inc/raccoon/nn/neuron.h#L18) perceptron model
 * To-do: layer
 * To-do: ANN
 
@@ -27,14 +27,14 @@ Take a look at [`tests/Makefile`](tests/Makefile) to configure your build system
 
 ## Usage example
 ### Variable
-Below is a simple example of possible usage:
+Below is a contrived example of possible usage:
 
 ```c
 // create alloctr
-// alloctr = ...
+vt_mallocator_t *alloctr = vt_mallocator_create();
 
 {
-    // create variables
+    // define variables
     rac_var_t *a = rac_var_make(alloctr, 2);
     rac_var_t *b = rac_var_make(alloctr, -3);
     rac_var_t *c = rac_var_make(alloctr, 10);
@@ -61,56 +61,59 @@ Below is a simple example of possible usage:
     rac_var_zero_grad(g);
 }
 
-// free manually
-rac_var_free(a);
-// ...
+// free all data
+vt_mallocator_destroy(alloctr);
 
-// or with allocator
-// allocator_free(alloctr)
+// you can also free data manually
+rac_var_free(a); // b, c, d, e, f, g
 ```
 
 For more details check out [`tests/src/main.c`](tests/src/main.c).
 
 ### Neuron
-The example below illustrates how to train Perceptron model:
+The example below illustrates how to train a Perceptron model or Linear Regression:
 
 ```c
 // create model: y = w1 * x1 + w2 * x2 + b
 const size_t input_size = 2;
-rac_neuron_t *perceptron = rac_neuron_make(alloctr, input_size, NULL); // activation is NULL (linear)
+rac_neuron_t *perceptron = rac_neuron_make(alloctr, input_size, NULL); // activation is linear (NULL)
 
-// target
-rac_var_t *target = rac_var_make(alloctr, 4);
+// define target
+rac_var_t *target = rac_var_make(alloctr, 4); // y
 
-// input
+// define input
 vt_plist_t *input = vt_plist_create(input_size, alloctr);
 vt_plist_push_back(input, rac_var_make(alloctr, 1)); // x1
 vt_plist_push_back(input, rac_var_make(alloctr, 2)); // x2
 
-// learn
+// train model
 const size_t epochs = 100;
 VT_FOREACH(i, 0, epochs) {
     // forward
     rac_var_t *yhat = rac_neuron_forward(perceptron, input);
 
     // loss
-    rac_var_t *cost = rac_var_sub(yhat, target);
+    rac_var_t *loss = rac_var_sub(yhat, target);
 
     // backward
     rac_neuron_zero_grad(perceptron);
-    rac_var_backward(cost);
+    rac_var_backward(loss);
 
     // update
     const rac_float lr = 0.05;
-    rac_neuron_update(perceptron, lr * cost->data);
+    rac_neuron_update(perceptron, lr * loss->data);
 
-    // free cost
-    rac_var_free(cost);
+    // free loss
+    rac_var_free(loss);
 }
 
+// free automatically
+vt_mallocator_destroy(alloctr);
+
+// free manually
 rac_var_free(target);
-plist_var_free(input);
 rac_neuron_free(perceptron);
+plist_var_free(input);
 ```
 
 For more details check out [`tests/src/main.c`](tests/src/main.c).
