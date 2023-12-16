@@ -327,7 +327,25 @@ void test_neuron(void) {
 }
 
 void test_layer(void) {
-    //
+    // allocate, test, free
+    const size_t input_size = 4;
+    const size_t output_size = 1;
+    rac_layer_t *layer = rac_layer_make(alloctr, input_size, output_size, NULL);
+    assert(layer->neurons != NULL);
+    assert(layer->cache != NULL);
+    assert(layer->activate == NULL);
+    assert(vt_plist_len(layer->neurons) == output_size);
+    assert(vt_plist_capacity(layer->cache) == output_size);
+    rac_layer_free(layer);
+
+    /**
+     * FORWARD PROPAGATION
+     */
+
+    // input
+    // target
+    // model
+    // loop
 }
 
 // frees plist and its contents
