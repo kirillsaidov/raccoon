@@ -5,6 +5,7 @@
  * Functions:
     - rac_var_make
     - rac_var_make_ex
+    - rac_var_make_rand
     - rac_var_free
     - rac_var_backward
     - rac_var_zero_grad
@@ -25,7 +26,7 @@
 typedef struct RaccoonVariable {
     // numerical data
     rac_float data;
-
+ 
     // gradient value
     rac_float grad;
 
@@ -60,6 +61,13 @@ extern rac_var_t *rac_var_make(struct VitaBaseAllocatorType *const alloctr, cons
  * @returns valid `rac_var_t*` or asserts on failure
  */
 extern rac_var_t *rac_var_make_ex(struct VitaBaseAllocatorType *const alloctr, const rac_float data, struct RaccoonVariable *parents[2], void (*backward)(struct RaccoonVariable*));
+
+/**
+ * @brief  Creates a random variable in range [0; 1)
+ * @param  alloctr allocator instance
+ * @returns valid `rac_var_t*` or asserts on failure
+ */
+extern rac_var_t *rac_var_make_rand(struct VitaBaseAllocatorType *const alloctr);
 
 /**
  * @brief  Frees a variable instance

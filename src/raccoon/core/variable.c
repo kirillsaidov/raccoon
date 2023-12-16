@@ -1,4 +1,5 @@
 #include "raccoon/core/variable.h"
+#include "vita/math/math.h"
 
 static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node_list);
 static void rac_var_add_backward(rac_var_t *const op_result);
@@ -36,6 +37,22 @@ rac_var_t *rac_var_make_ex(struct VitaBaseAllocatorType *const alloctr, const ra
         .grad = 0,
         .parents = { parents[0], parents[1] },
         .backward = backward,
+        .alloctr = alloctr,
+    };
+
+    return var;
+}
+
+rac_var_t *rac_var_make_rand(struct VitaBaseAllocatorType *const alloctr) {
+    // allocate for variable
+    rac_var_t *var = (alloctr == NULL)
+        ? VT_CALLOC(sizeof(rac_var_t))
+        : VT_ALLOCATOR_ALLOC(alloctr, sizeof(rac_var_t));
+
+    // init
+    *var = (rac_var_t) {
+        .data = vt_math_random_f32_uniform(0, 1),
+        .grad = 0,
         .alloctr = alloctr,
     };
 
