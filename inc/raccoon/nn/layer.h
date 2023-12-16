@@ -58,7 +58,7 @@ extern void rac_layer_free(rac_layer_t *layer);
  * @brief  Forward operation
  * @param  layer instance
  * @param  input ditto
- * @returns valid `vt_plist_t*` or asserts on failure
+ * @returns valid `vt_plist_t*` of `rac_var_t*` or asserts on failure
  */
 extern vt_plist_t *rac_layer_forward(rac_layer_t *const layer, const vt_plist_t *const input);
 

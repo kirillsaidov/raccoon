@@ -15,6 +15,7 @@ void test_layer(void);
 /**
  * HELPER FUNCTIONS
  */
+
 void plist_var_free(vt_plist_t *list);
 
 static vt_mallocator_t *alloctr = NULL;
@@ -328,24 +329,80 @@ void test_neuron(void) {
 
 void test_layer(void) {
     // allocate, test, free
-    const size_t input_size = 4;
-    const size_t output_size = 1;
-    rac_layer_t *layer = rac_layer_make(alloctr, input_size, output_size, NULL);
+    rac_layer_t *layer = rac_layer_make(alloctr, 4, 1, NULL);
     assert(layer->neurons != NULL);
     assert(layer->cache != NULL);
     assert(layer->activate == NULL);
-    assert(vt_plist_len(layer->neurons) == output_size);
-    assert(vt_plist_capacity(layer->cache) == output_size);
+    assert(vt_plist_len(layer->neurons) == 1);
+    assert(vt_plist_capacity(layer->cache) == 1);
     rac_layer_free(layer);
 
     /**
      * FORWARD PROPAGATION
      */
 
+    /* --- INIT --- */
+
     // input
-    // target
+    const size_t input_size = 3;
+    const size_t input_rows = 8;
+    vt_plist_t *input = vt_plist_create(input_rows, alloctr);
+    
+    // define data
+    const rac_float data[] = {
+        // x     y
+        0, 0, 0, 1,
+        0, 0, 1, 0,
+        0, 1, 1, 0,
+        1, 1, 1, 0,
+        1, 1, 0, 1,
+        1, 0, 0, 1,
+        1, 0, 1, 0,
+        0, 1, 0, 1,
+    };
+    VT_FOREACH(i, 0, input_rows) {
+        vt_plist_t *x = vt_plist_create(input_size, alloctr);
+        VT_FOREACH(j, 0, input_size) vt_plist_push_back(x, rac_var_make(alloctr, data[vt_index_2d_to_1d(i, j, 4)]));
+        vt_plist_push_back(input, x);
+    }
+    
     // model
+    layer = rac_layer_make(alloctr, input_size, 1, NULL);
+
+    /* --- FORWARD --- */
+
     // loop
+    const rac_float lr = 0.05;
+    const size_t iters = 100;
+    VT_FOREACH(epoch, 0, iters) {
+        // forward
+        vt_plist_t *x = vt_plist_get(input, 0);
+        vt_plist_t *out = rac_layer_forward(layer, x);
+        rac_var_t *yhat = vt_plist_get(out, 0);
+
+        // loss
+        rac_var_t *target = rac_var_make(alloctr, data[vt_index_2d_to_1d(0, 3, 4)]);
+        rac_var_t *loss = rac_var_sub(yhat, target);
+
+        // backward
+        VT_FOREACH(i, 0, vt_plist_len(layer->neurons)) rac_neuron_zero_grad(vt_plist_get(layer->neurons, i));
+        rac_var_backward(loss);
+
+        // update
+        VT_FOREACH(i, 0, vt_plist_len(layer->neurons)) rac_neuron_update(vt_plist_get(layer->neurons, i), lr * loss->data);
+
+        // output progress
+        printf("yhat %.4f loss %.4f\n", yhat->data, loss->data);
+
+        // free
+        rac_var_free(loss);
+        rac_var_free(target);
+    }
+
+    // free
+    VT_FOREACH(i, 0, vt_plist_len(input)) plist_var_free(vt_plist_get(input, i));
+    vt_plist_destroy(input);
+    rac_layer_free(layer);
 }
 
 // frees plist and its contents
