@@ -10,6 +10,7 @@ static int test_num = 0;
  */
 void test_var(void);
 void test_neuron(void);
+void test_layer(void);
 
 /**
  * HELPER FUNCTIONS
@@ -28,7 +29,8 @@ int main(void) {
     {
         vt_debug_disable_output(true);
         // TEST(test_var);
-        TEST(test_neuron);
+        // TEST(test_neuron);
+        TEST(test_layer);
     }
     vt_mallocator_print_stats(alloctr->stats);
     vt_mallocator_destroy(alloctr);
@@ -322,6 +324,10 @@ void test_neuron(void) {
     rac_neuron_free(perceptron);
     // plist_var_free(params);  // no need to free, is freed by the neuron, since it was passed in as a parameter
     // rac_var_free(pred);      // no need to free, is freed by the neuron, since it was allocated by it
+}
+
+void test_layer(void) {
+    //
 }
 
 // frees plist and its contents

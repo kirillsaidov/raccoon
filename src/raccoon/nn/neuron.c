@@ -1,5 +1,4 @@
 #include "raccoon/nn/neuron.h"
-#include "vita/math/math.h"
 
 /* 
     Neuron creation/destruction
@@ -21,7 +20,7 @@ rac_neuron_t *rac_neuron_make(struct VitaBaseAllocatorType *const alloctr, const
     
     // init weights + bias
     VT_FOREACH(i, 0, input_size+1) {
-        vt_plist_push_back(neuron->params, rac_var_make(alloctr, vt_math_random_f32_uniform(0, 1)));
+        vt_plist_push_back(neuron->params, rac_var_make_rand(alloctr));
     }
 
     return neuron;
@@ -64,9 +63,6 @@ void rac_neuron_free(rac_neuron_t *neuron) {
 
     // free neuron
     (neuron->alloctr) ? VT_ALLOCATOR_FREE(neuron->alloctr, neuron) : VT_FREE(neuron);
-
-    // reset
-    *((rac_neuron_t**)neuron) = NULL;
 }
 
 /* 
