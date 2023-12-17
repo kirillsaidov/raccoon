@@ -96,18 +96,8 @@ void rac_var_zero_grad(rac_var_t *const var) {
     // check for invalid input
     VT_DEBUG_ASSERT(var != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
 
-    // build parent tree
-    vt_plist_t *node_list = rac_var_build_parent_tree(var);
-
-    // zero out gradients
-    const size_t len = vt_plist_len(node_list);
-    VT_FOREACH(i, 0, len) {
-        rac_var_t *node = vt_plist_get(node_list, i);
-        node->grad = 0;
-    }
-
-    // free parent tree
-    vt_plist_destroy(node_list);
+    // zero grad
+    var->grad = 0;
 }
 
 rac_var_t *rac_var_add(rac_var_t *const lhs, rac_var_t *const rhs) {
