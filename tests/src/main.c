@@ -68,6 +68,8 @@ void test_var(void) {
 
     // zero grad
     rac_var_zero_grad(c);
+    rac_var_zero_grad(b);
+    rac_var_zero_grad(a);
     assert(c->grad == 0);
     assert(a->grad == 0);
     assert(b->grad == 0);
@@ -97,6 +99,8 @@ void test_var(void) {
 
     // zero grad
     rac_var_zero_grad(c);
+    rac_var_zero_grad(b);
+    rac_var_zero_grad(a);
     assert(c->grad == 0);
     assert(a->grad == 0);
     assert(b->grad == 0);
@@ -126,6 +130,8 @@ void test_var(void) {
 
     // zero grad
     rac_var_zero_grad(c);
+    rac_var_zero_grad(b);
+    rac_var_zero_grad(a);
     assert(c->grad == 0);
     assert(a->grad == 0);
     assert(b->grad == 0);
@@ -155,6 +161,8 @@ void test_var(void) {
 
     // zero grad
     rac_var_zero_grad(c);
+    rac_var_zero_grad(b);
+    rac_var_zero_grad(a);
     assert(c->grad == 0);
     assert(a->grad == 0);
     assert(b->grad == 0);
@@ -209,6 +217,12 @@ void test_var(void) {
 
     // zero grad
     rac_var_zero_grad(g);
+    rac_var_zero_grad(a);
+    rac_var_zero_grad(b);
+    rac_var_zero_grad(c);
+    rac_var_zero_grad(d);
+    rac_var_zero_grad(e);
+    rac_var_zero_grad(f);
     assert(g->grad == 0);
     assert(f->grad == 0);
     assert(d->grad == 0);
@@ -385,11 +399,11 @@ void test_layer(void) {
         rac_var_t *loss = rac_var_sub(yhat, target);
 
         // backward
-        VT_FOREACH(i, 0, vt_plist_len(layer->neurons)) rac_neuron_zero_grad(vt_plist_get(layer->neurons, i));
+        rac_layer_zero_grad(layer);
         rac_var_backward(loss);
 
         // update
-        VT_FOREACH(i, 0, vt_plist_len(layer->neurons)) rac_neuron_update(vt_plist_get(layer->neurons, i), lr * loss->data);
+        rac_layer_update(layer, lr * loss->data);
 
         // output progress
         printf("yhat %.4f loss %.4f\n", yhat->data, loss->data);
