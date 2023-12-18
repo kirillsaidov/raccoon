@@ -51,7 +51,7 @@ rac_var_t *rac_var_make_rand(struct VitaBaseAllocatorType *const alloctr) {
 
     // init
     *var = (rac_var_t) {
-        .data = vt_math_random_f32_uniform(-1, 1),
+        .data = vt_math_random_f32_uniform(0, 1),
         .grad = 0,
         .alloctr = alloctr,
     };

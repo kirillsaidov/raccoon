@@ -392,7 +392,7 @@ void test_layer(void) {
     /* --- FORWARD --- */
 
     // loop
-    const rac_float lr = 0.001;
+    const rac_float lr = 0.005;
     const size_t iters = 100;
     VT_FOREACH(epoch, 0, iters) {
         // batch forward
@@ -405,8 +405,9 @@ void test_layer(void) {
             rac_var_t *yhat = vt_plist_get(out, 0);
             rac_var_t *ytarget = vt_plist_get(target, i);
 
-            // loss
+            // loss: mse
             loss = rac_var_sub(yhat, ytarget); vt_plist_push_back(cache, loss);
+            loss = rac_var_mul(loss, loss); vt_plist_push_back(cache, loss);
             loss = rac_var_add(loss, vt_plist_get(cache, 0)); vt_plist_push_front(cache, loss);
             
             // accuracy
