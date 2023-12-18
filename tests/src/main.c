@@ -6,11 +6,13 @@ static int test_num = 0;
 #define TEST(func) { printf("(%d) ---> TESTING: %s\n", test_num, #func); func(); test_num++; }
 
 /**
- * TESTING
+ * TESTS
  */
+
 void test_var(void);
 void test_neuron(void);
 void test_layer(void);
+void test_mlp(void);
 
 /**
  * HELPER FUNCTIONS
@@ -31,13 +33,18 @@ int main(void) {
         vt_debug_disable_output(true);
         // TEST(test_var);
         // TEST(test_neuron);
-        TEST(test_layer);
+        // TEST(test_layer);
+        TEST(test_mlp);
     }
     vt_mallocator_print_stats(alloctr->stats);
     vt_mallocator_destroy(alloctr);
 
     return 0;
 }
+
+/**
+ * TESTS
+ */
 
 void test_var(void) {
     // allocate, test, free
@@ -435,6 +442,27 @@ void test_layer(void) {
     rac_layer_free(layer);
     rac_var_free(batch_size);
 }
+
+void test_mlp(void) {
+    // allocate, test, free
+    rac_mlp_t *model = rac_mlp_make(alloctr, 3, (size_t[]) {2, 4, 1}, NULL, NULL);
+    assert(model->layers != NULL);
+    assert(model->last_prediction != NULL);
+    assert(vt_plist_len(model->layers) == 2);
+    assert(vt_plist_capacity(model->last_prediction) == 1);
+    rac_mlp_free(model);
+
+    /**
+     * TEST MLP MODEL
+     */
+
+    /* --- INIT --- */
+    /* --- FORWARD --- */
+}
+
+/**
+ * HELPER FUNCTIONS
+ */
 
 // frees plist and its contents
 void plist_var_free(vt_plist_t *list) {
