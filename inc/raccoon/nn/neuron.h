@@ -48,6 +48,8 @@ extern rac_neuron_t *rac_neuron_make(struct VitaBaseAllocatorType *const alloctr
  * @param  params initialized (weights + bias) parameters
  * @param  activate activation function; if linear use `NULL`
  * @returns valid `rac_neuron_t*` or asserts on failure
+ * 
+ * @note neuron frees `params` automatically
  */
 extern rac_neuron_t *rac_neuron_make_ex(struct VitaBaseAllocatorType *const alloctr, vt_plist_t *const params, rac_var_t *(*activate)(rac_var_t *const));
 

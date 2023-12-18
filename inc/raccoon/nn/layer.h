@@ -10,8 +10,6 @@
     - rac_layer_update
 */
 
-#include "raccoon/core/core.h"
-#include "raccoon/core/variable.h"
 #include "raccoon/nn/neuron.h"
 
 // Layer with neurons
@@ -19,8 +17,8 @@ typedef struct RaccoonLayer {
     // neurons
     vt_plist_t *neurons;
 
-    // model cache: by-product allocations (layer keeps track of all allocations it makes and frees it)
-    vt_plist_t *cache;
+    // model last output (predictions)
+    vt_plist_t *last_prediction;
 
     // activation funtions (it must set the backward function to be used in backward propagation)
     rac_var_t *(*activate)(rac_var_t *const);

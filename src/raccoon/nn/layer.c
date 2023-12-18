@@ -13,7 +13,7 @@ rac_layer_t *rac_layer_make(struct VitaBaseAllocatorType *const alloctr, const s
     // init layer
     *layer = (rac_layer_t) {
         .neurons = vt_plist_create(output_size, alloctr),
-        .cache = vt_plist_create(output_size, alloctr),
+        .last_prediction = vt_plist_create(output_size, alloctr),
         .activate = activate,
         .alloctr = alloctr,
     };
@@ -36,7 +36,7 @@ void rac_layer_free(rac_layer_t *layer) {
     vt_plist_destroy(layer->neurons);
 
     // destroy the cache container (its contents are freed by neurons)
-    vt_plist_destroy(layer->cache);
+    vt_plist_destroy(layer->last_prediction);
 
     // free layer
     (layer->alloctr) ? VT_ALLOCATOR_FREE(layer->alloctr, layer) : VT_FREE(layer);
@@ -57,16 +57,16 @@ vt_plist_t *rac_layer_forward(rac_layer_t *const layer, const vt_plist_t *const 
     VT_ENFORCE(input_size+1 == layer_input_size, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INCOMPATIBLE_SHAPES));
 
     // clear cache
-    vt_plist_clear(layer->cache);
+    vt_plist_clear(layer->last_prediction);
 
     // forward
     const size_t neurons_len = vt_plist_len(layer->neurons);
     VT_FOREACH(i, 0, neurons_len) {
         rac_neuron_t *n = vt_plist_get(layer->neurons, i);
-        vt_plist_push_back(layer->cache, rac_neuron_forward(n, input));
+        vt_plist_push_back(layer->last_prediction, rac_neuron_forward(n, input));
     }
 
-    return layer->cache;
+    return layer->last_prediction;
 }
 
 void rac_layer_zero_grad(rac_layer_t *const layer) {

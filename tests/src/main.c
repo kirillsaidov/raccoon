@@ -345,10 +345,10 @@ void test_layer(void) {
     // allocate, test, free
     rac_layer_t *layer = rac_layer_make(alloctr, 4, 1, NULL);
     assert(layer->neurons != NULL);
-    assert(layer->cache != NULL);
+    assert(layer->last_prediction != NULL);
     assert(layer->activate == NULL);
     assert(vt_plist_len(layer->neurons) == 1);
-    assert(vt_plist_capacity(layer->cache) == 1);
+    assert(vt_plist_capacity(layer->last_prediction) == 1);
     rac_layer_free(layer);
 
     /**
