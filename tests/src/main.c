@@ -360,7 +360,9 @@ void test_layer(void) {
     // input
     const size_t input_size = 3;
     const size_t input_rows = 8;
+    vt_plist_t *cache = vt_plist_create(input_rows, alloctr);
     vt_plist_t *input = vt_plist_create(input_rows, alloctr);
+    vt_plist_t *target = vt_plist_create(input_rows, alloctr);
     
     // define data
     const rac_float data[] = {
@@ -378,25 +380,40 @@ void test_layer(void) {
         vt_plist_t *x = vt_plist_create(input_size, alloctr);
         VT_FOREACH(j, 0, input_size) vt_plist_push_back(x, rac_var_make(alloctr, data[vt_index_2d_to_1d(i, j, 4)]));
         vt_plist_push_back(input, x);
+        vt_plist_push_back(target, rac_var_make(alloctr, data[vt_index_2d_to_1d(i, 3, 4)]));
     }
     
     // model
     layer = rac_layer_make(alloctr, input_size, 1, NULL);
 
+    // size
+    rac_var_t *batch_size = rac_var_make(alloctr, input_rows);
+
     /* --- FORWARD --- */
 
     // loop
-    const rac_float lr = 0.05;
+    const rac_float lr = 0.001;
     const size_t iters = 100;
     VT_FOREACH(epoch, 0, iters) {
-        // forward
-        vt_plist_t *x = vt_plist_get(input, 0);
-        vt_plist_t *out = rac_layer_forward(layer, x);
-        rac_var_t *yhat = vt_plist_get(out, 0);
+        // batch forward
+        rac_float accuracy = 0;
+        rac_var_t *loss = rac_var_make(alloctr, 0); vt_plist_push_front(cache, loss);
+        VT_FOREACH(i, 0, input_rows) {
+            // forward
+            vt_plist_t *x = vt_plist_get(input, i);
+            vt_plist_t *out = rac_layer_forward(layer, x);
+            rac_var_t *yhat = vt_plist_get(out, 0);
+            rac_var_t *ytarget = vt_plist_get(target, i);
 
-        // loss
-        rac_var_t *target = rac_var_make(alloctr, data[vt_index_2d_to_1d(0, 3, 4)]);
-        rac_var_t *loss = rac_var_sub(yhat, target);
+            // loss
+            loss = rac_var_sub(yhat, ytarget); vt_plist_push_back(cache, loss);
+            loss = rac_var_add(loss, vt_plist_get(cache, 0)); vt_plist_push_front(cache, loss);
+            
+            // accuracy
+            accuracy += ((yhat->data > 0.5) == ytarget->data);
+        }
+        loss = rac_var_div(loss, batch_size); vt_plist_push_back(cache, loss);
+        accuracy /= input_rows;
 
         // backward
         rac_layer_zero_grad(layer);
@@ -406,17 +423,16 @@ void test_layer(void) {
         rac_layer_update(layer, lr * loss->data);
 
         // output progress
-        printf("yhat %.4f loss %.4f\n", yhat->data, loss->data);
-
-        // free
-        rac_var_free(loss);
-        rac_var_free(target);
+        if (epoch % 10 == 0) printf("epoch %3zu loss %.4f accuracy %.4f\n", epoch, loss->data, accuracy);
     }
 
     // free
+    plist_var_free(cache);
+    plist_var_free(target);
     VT_FOREACH(i, 0, vt_plist_len(input)) plist_var_free(vt_plist_get(input, i));
     vt_plist_destroy(input);
     rac_layer_free(layer);
+    rac_var_free(batch_size);
 }
 
 // frees plist and its contents
