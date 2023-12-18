@@ -18,9 +18,6 @@ typedef struct RaccoonMLP {
     // layers
     vt_plist_t *layers;
 
-    // model last output (predictions)
-    vt_plist_t *last_prediction;
-
     // allocator: if `NULL`, then calloc/realloc/free is used
     struct VitaBaseAllocatorType *alloctr;
 } rac_mlp_t;

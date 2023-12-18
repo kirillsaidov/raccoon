@@ -23,7 +23,6 @@ rac_mlp_t *rac_mlp_make(
     // init mlp
     *mlp = (rac_mlp_t) {
         .layers = vt_plist_create(num_layers, alloctr),
-        .last_prediction = vt_plist_create(shape[num_layers-1], alloctr),
         .alloctr = alloctr,
     };
 
@@ -50,7 +49,6 @@ rac_mlp_t *rac_mlp_make_ex(struct VitaBaseAllocatorType *const alloctr, vt_plist
     // init mlp
     *mlp = (rac_mlp_t) {
         .layers = layers,
-        .last_prediction = vt_plist_create(vt_plist_len(vt_plist_get(layers, vt_plist_len(layers)-1)), alloctr),
         .alloctr = alloctr,
     };
 
@@ -66,9 +64,6 @@ void rac_mlp_free(rac_mlp_t *mlp) {
     VT_FOREACH(i, 0, layers_len) rac_layer_free(vt_plist_get(mlp->layers, i));
     vt_plist_destroy(mlp->layers);
 
-    // destroy the cache container (its contents are freed by neurons)
-    vt_plist_destroy(mlp->last_prediction);
-
     // free mlp
     (mlp->alloctr) ? VT_ALLOCATOR_FREE(mlp->alloctr, mlp) : VT_FREE(mlp);
 }
@@ -77,7 +72,44 @@ void rac_mlp_free(rac_mlp_t *mlp) {
     MLP operations
 */
 
-vt_plist_t *rac_mlp_forward(rac_mlp_t *const mlp, const vt_plist_t *const input);
-void rac_mlp_zero_grad(rac_mlp_t *const mlp);
-void rac_mlp_update(rac_mlp_t *const mlp, const rac_float lr);
+vt_plist_t *rac_mlp_forward(rac_mlp_t *const mlp, const vt_plist_t *const input) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(mlp != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(input != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+
+    // check shape
+    const size_t input_size = vt_plist_len(input);
+    rac_layer_t *layer = vt_plist_get(mlp->layers, 0);
+    rac_neuron_t *neuron = vt_plist_get(layer->neurons, 0);
+    const size_t layer_input_size = vt_plist_len(neuron->params);
+    VT_ENFORCE(input_size+1 == layer_input_size, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INCOMPATIBLE_SHAPES));
+
+    // forward
+    vt_plist_t *output = (vt_plist_t*)input;
+    const size_t layers_len = vt_plist_len(mlp->layers);
+    VT_FOREACH(i, 0, layers_len) {
+        rac_layer_t *l = vt_plist_get(mlp->layers, i);
+        output = rac_layer_forward(l, output);
+    }
+
+    return output;
+}
+
+void rac_mlp_zero_grad(rac_mlp_t *const mlp) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(mlp != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+
+    // zero out all gradients
+    const size_t layers_len = vt_plist_len(mlp->layers);
+    VT_FOREACH(i, 0, layers_len) rac_layer_zero_grad(vt_plist_get(mlp->layers, i));
+}
+
+void rac_mlp_update(rac_mlp_t *const mlp, const rac_float lr) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(mlp != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+
+    // zero out all gradients
+    const size_t layers_len = vt_plist_len(mlp->layers);
+    VT_FOREACH(i, 0, layers_len) rac_layer_update(vt_plist_get(mlp->layers, i), lr);
+}
 
