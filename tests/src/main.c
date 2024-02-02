@@ -32,9 +32,9 @@ int main(void) {
     {
         vt_debug_disable_output(true);
         // TEST(test_var);
-        // TEST(test_neuron);
+        TEST(test_neuron);
         // TEST(test_layer);
-        TEST(test_mlp);
+        // TEST(test_mlp);
     }
     vt_mallocator_print_stats(alloctr->stats);
     vt_mallocator_destroy(alloctr);
@@ -175,6 +175,73 @@ void test_var(void) {
     assert(b->grad == 0);
 
     // free
+    rac_var_free(a);
+    rac_var_free(b);
+    rac_var_free(c);
+    
+    /**
+     * REMAKE: reinit existing variable
+     * INPLACE: inplace operations
+     */
+    
+    // init
+    a = rac_var_make(alloctr, 6);
+    b = rac_var_make(alloctr, 2);
+    c = rac_var_div(a, b);
+    
+    // backward
+    rac_var_backward(c);
+    
+    // check values
+    assert(a->data == 6);
+    assert(a->grad == 2);
+    assert(a->parents[0] == NULL && a->parents[1] == NULL);
+    assert(a->backward == NULL);
+    assert(b->data == 2);
+    assert(b->grad == 6);
+    assert(b->parents[0] == NULL && b->parents[1] == NULL);
+    assert(b->backward == NULL);
+    assert(c->data == 3);
+    assert(c->grad == 1);
+    assert(c->parents[0] == a && c->parents[1] == b);
+    assert(c->backward != NULL);
+
+    // zero grad
+    rac_var_zero_grad(a);
+    rac_var_zero_grad(b);
+    rac_var_zero_grad(c);
+
+    // remake: reuse 'c'
+    rac_var_remake(a, 10, NULL, NULL);
+    assert(a->data == 10);
+    assert(a->grad == 0);
+    assert(a->parents[0] == NULL && a->parents[1] == NULL);
+    assert(a->backward == NULL);
+
+    // inplace
+    rac_var_add_inplace(c, a, b);
+    assert(c->data == 12);
+    assert(c->grad == 0);
+    assert(c->parents[0] == a && c->parents[1] == b);
+    assert(c->backward != NULL);
+
+    // backward
+    rac_var_backward(c);
+
+    // check values
+    assert(a->data == 10);
+    assert(a->grad == 1);
+    assert(a->parents[0] == NULL && a->parents[1] == NULL);
+    assert(a->backward == NULL);
+    assert(b->data == 2);
+    assert(b->grad == 1);
+    assert(b->parents[0] == NULL && b->parents[1] == NULL);
+    assert(b->backward == NULL);
+    assert(c->data == 12);
+    assert(c->grad == 1);
+    assert(c->parents[0] == a && c->parents[1] == b);
+    assert(c->backward != NULL);
+
     rac_var_free(a);
     rac_var_free(b);
     rac_var_free(c);

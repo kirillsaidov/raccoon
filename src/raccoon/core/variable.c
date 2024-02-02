@@ -59,6 +59,18 @@ rac_var_t *rac_var_make_rand(struct VitaBaseAllocatorType *const alloctr) {
     return var;
 }
 
+void rac_var_remake(rac_var_t *var, const rac_float data, struct RaccoonVariable *parents[2], void (*backward)(struct RaccoonVariable*)) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(var != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+
+    // update values
+    var->grad = 0;
+    var->data = data;
+    var->parents[0] = parents ? parents[0] : NULL;
+    var->parents[1] = parents ? parents[1] : NULL;
+    var->backward = backward;
+}
+
 void rac_var_free(rac_var_t *var) {
     // check for invalid input
     VT_DEBUG_ASSERT(var != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
@@ -126,6 +138,46 @@ rac_var_t *rac_var_div(rac_var_t *const lhs, rac_var_t *const rhs) {
     VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     VT_DEBUG_ASSERT(rhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     return rac_var_make_ex(lhs->alloctr, lhs->data / rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_mul_backward);
+}
+
+void rac_var_add_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(out != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(rhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    
+    // remake with updated variables
+    rac_var_remake(out, lhs->data + rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_add_backward);
+}
+
+void rac_var_sub_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(out != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(rhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+
+    // remake with updated variables
+    rac_var_remake(out, lhs->data - rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_add_backward);
+}
+
+void rac_var_mul_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(out != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(rhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+
+    // remake with updated variables
+    rac_var_remake(out, lhs->data * rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_mul_backward); 
+}
+
+void rac_var_div_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(out != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(lhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(rhs != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+
+    // remake with updated variables
+    rac_var_remake(out, lhs->data / rhs->data, (rac_var_t*[2]){lhs, rhs}, rac_var_mul_backward); 
 }
 
 vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start) {

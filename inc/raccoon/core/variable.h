@@ -6,6 +6,7 @@
     - rac_var_make
     - rac_var_make_ex
     - rac_var_make_rand
+    - rac_var_remake
     - rac_var_free
     - rac_var_backward
     - rac_var_zero_grad
@@ -13,6 +14,10 @@
     - rac_var_sub
     - rac_var_mul
     - rac_var_div
+    - rac_var_add_inplace
+    - rac_var_sub_inplace
+    - rac_var_mul_inplace
+    - rac_var_div_inplace
     - rac_var_build_parent_tree
 */
 
@@ -70,6 +75,16 @@ extern rac_var_t *rac_var_make_ex(struct VitaBaseAllocatorType *const alloctr, c
 extern rac_var_t *rac_var_make_rand(struct VitaBaseAllocatorType *const alloctr);
 
 /**
+ * @brief  Reinitializes the variable with new data
+ * @param  var variable instance
+ * @param  data allocator instance
+ * @param  parents parent nodes
+ * @param  backward backward function
+ * @returns None
+ */
+extern void rac_var_remake(rac_var_t *var, const rac_float data, struct RaccoonVariable *parents[2], void (*backward)(struct RaccoonVariable*));
+
+/**
  * @brief  Frees a variable instance
  * @param  var variable instance
  * @returns None
@@ -96,6 +111,7 @@ extern void rac_var_zero_grad(rac_var_t *const var);
 
 /**
  * @brief  Add two variables
+ * @param  lhs variable instance
  * @param  rhs variable instance
  * @returns valid `rac_var_t*` or asserts on failure
  */
@@ -124,6 +140,42 @@ extern rac_var_t *rac_var_mul(rac_var_t *const lhs, rac_var_t *const rhs);
  * @returns valid `rac_var_t*` or asserts on failure
  */
 extern rac_var_t *rac_var_div(rac_var_t *const lhs, rac_var_t *const rhs);
+
+/**
+ * @brief  Add-inplace two variables
+ * @param  out variable instance
+ * @param  lhs variable instance
+ * @param  rhs variable instance
+ * @returns None
+ */
+extern void rac_var_add_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs);
+
+/**
+ * @brief  Substract-inplace two variables
+ * @param  out variable instance
+ * @param  lhs variable instance
+ * @param  rhs variable instance
+ * @returns None
+ */
+extern void rac_var_sub_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs);
+
+/**
+ * @brief  Multiply-inplace two variables
+ * @param  out variable instance
+ * @param  lhs variable instance
+ * @param  rhs variable instance
+ * @returns None
+ */
+extern void rac_var_mul_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs);
+
+/**
+ * @brief  Divide-inplace two variables
+ * @param  out variable instance
+ * @param  lhs variable instance
+ * @param  rhs variable instance
+ * @returns None
+ */
+extern void rac_var_div_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs);
 
 /* 
     Other
