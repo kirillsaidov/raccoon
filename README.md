@@ -30,6 +30,8 @@ Take a look at [`tests/Makefile`](tests/Makefile) to configure your build system
 Below is a contrived example of possible usage:
 
 ```c
+#include "raccoon/raccoon.h"
+
 // create alloctr
 vt_mallocator_t *alloctr = vt_mallocator_create();
 
@@ -58,7 +60,7 @@ vt_mallocator_t *alloctr = vt_mallocator_create();
     assert(a->grad == 6);
 
     // zero grad
-    rac_var_zero_grad(g);
+    rac_var_zero_grad(g); // call for each var if needed: a, b, c, d, e, f
 }
 
 // free all data
@@ -74,43 +76,45 @@ For more details check out [`tests/src/main.c`](tests/src/main.c).
 The example below illustrates how to train a Perceptron model or Linear Regression:
 
 ```c
-// create model: y = w1 * x1 + w2 * x2 + b
+#include "raccoon/raccoon.h"
+
+// model: a basic linear regression with 2 features (x1, x2), coefficients (w1, w2) and a bias (b)
+// model: y = w1 * x1 + w2 * x2 + b
 const size_t input_size = 2;
 rac_neuron_t *perceptron = rac_neuron_make(alloctr, input_size, NULL); // activation is linear (NULL)
 
 // define target
-rac_var_t *target = rac_var_make(alloctr, 4); // y
+rac_var_t *target = rac_var_make(alloctr, 4);               // y
 
 // define input
-vt_plist_t *input = vt_plist_create(input_size, alloctr);
-vt_plist_push_back(input, rac_var_make(alloctr, 1)); // x1
-vt_plist_push_back(input, rac_var_make(alloctr, 2)); // x2
+vt_plist_t *input = vt_plist_create(input_size, alloctr);   // create input list
+vt_plist_push_back(input, rac_var_make(alloctr, 1));        // save x1 to input list
+vt_plist_push_back(input, rac_var_make(alloctr, 2));        // save x2 to input list
 
 // train model
 const size_t epochs = 100;
+const rac_float lr = 0.05;
+rac_var_t *cost = rac_var_make(alloctr, 0);
 VT_FOREACH(i, 0, epochs) {
     // forward
     rac_var_t *yhat = rac_neuron_forward(perceptron, input);
-
-    // loss
-    rac_var_t *loss = rac_var_sub(yhat, target);
+    
+    // calculate loss
+    rac_var_sub_inplace(cost, yhat, target); // reuse 'cost' variable by inplacing a new value
 
     // backward
     rac_neuron_zero_grad(perceptron);
-    rac_var_backward(loss);
+    rac_var_backward(cost);
 
     // update
-    const rac_float lr = 0.05;
     rac_neuron_update(perceptron, lr * loss->data);
-
-    // free loss
-    rac_var_free(loss);
 }
 
 // free automatically
 vt_mallocator_destroy(alloctr);
 
-// free manually
+// or free manually
+rac_var_free(cost);
 rac_var_free(target);
 rac_neuron_free(perceptron);
 plist_var_free(input);
