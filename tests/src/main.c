@@ -32,8 +32,8 @@ int main(void) {
     {
         vt_debug_disable_output(true);
         // TEST(test_var);
-        TEST(test_neuron);
-        // TEST(test_layer);
+        // TEST(test_neuron);
+        TEST(test_layer);
         // TEST(test_mlp);
     }
     vt_mallocator_print_stats(alloctr->stats);
@@ -327,23 +327,29 @@ void test_neuron(void) {
     rac_neuron_free(perceptron);
 
     /**
-     * FORWARD PROPAGATION
+     * FORWARD PROPAGATION EXAMPLE:
      */
 
     // input
-    rac_var_t *target = rac_var_make(alloctr, 4);
-    vt_plist_t *input = vt_plist_create(input_size, alloctr);
-    vt_plist_push_back(input, rac_var_make(alloctr, 1)); // x1
-    vt_plist_push_back(input, rac_var_make(alloctr, 2)); // x2
+    rac_var_t *target = rac_var_make(alloctr, 4);                // the target value
+    vt_plist_t *input = vt_plist_create(input_size, alloctr);    // list to store our inputs
+    vt_plist_push_back(input, rac_var_make(alloctr, 1));         // add x1 input to list
+    vt_plist_push_back(input, rac_var_make(alloctr, 2));         // add x2 input to list
 
     // params
-    vt_plist_t *params = vt_plist_create(input_size+1, alloctr);
-    vt_plist_push_back(params, rac_var_make(alloctr, 0.5)); // w1
-    vt_plist_push_back(params, rac_var_make(alloctr, 0.5)); // w2
-    vt_plist_push_back(params, rac_var_make(alloctr, 0.5)); // b
+    vt_plist_t *params = vt_plist_create(input_size+1, alloctr); // list to store model params
+    vt_plist_push_back(params, rac_var_make(alloctr, 0.5));      // w1
+    vt_plist_push_back(params, rac_var_make(alloctr, 0.5));      // w2
+    vt_plist_push_back(params, rac_var_make(alloctr, 0.5));      // b
 
-    // y = w1 * x1 + w2 * x2 + b
+    // model: a basic linear regression with 2 features (x1, x2), coefficients (w1, w2) and a bias (b)
+    // model: y = w1 * x1 + w2 * x2 + b
     perceptron = rac_neuron_make_ex(alloctr, params, NULL);
+
+    // same: rac_neuron_make(alloctr, input_size, activation) => no need to define our parameters
+    // same: perceptron = rac_neuron_make(alloctr, 2, NULL);
+
+    // check model parameters
     assert(perceptron->params != NULL);
     assert(perceptron->cache != NULL);
     assert(perceptron->activate == NULL);
@@ -360,42 +366,52 @@ void test_neuron(void) {
 
     // backward
     rac_var_backward(loss);
+
+    // free
+    rac_var_free(loss);
+    
+    // check gradient values
     assert(((rac_var_t*)vt_plist_get(params, 0))->grad == ((rac_var_t*)vt_plist_get(input, 0))->data);
     assert(((rac_var_t*)vt_plist_get(params, 1))->grad == ((rac_var_t*)vt_plist_get(input, 1))->data);
     assert(((rac_var_t*)vt_plist_get(params, 2))->grad == 1);
 
+    /**
+     * TRAINING:
+    */
+
     // loop
     const size_t iters = 100;
+    const rac_float lr = 0.05;
+    rac_var_t *cost = rac_var_make(alloctr, 0);
     VT_FOREACH(epoch, 0, iters) {
         // forward
         rac_var_t *yhat = rac_neuron_forward(perceptron, input);
 
-        // loss
-        rac_var_t *cost = rac_var_sub(yhat, target);
+        // calculate loss
+        rac_var_sub_inplace(cost, yhat, target); // reuse 'cost' variable by inplacing a new value
 
         // backward
         rac_neuron_zero_grad(perceptron);
         rac_var_backward(cost);
 
         // update
-        const rac_float lr = 0.05;
-        const rac_float cost_data = cost->data;
         rac_neuron_update(perceptron, lr * cost->data);
 
-        // free cost
-        rac_var_free(cost);
-
         // stop
-        if (cost_data > -0.01 && cost_data < 0.01) break;
+        if (cost->data > -0.01 && cost->data < 0.01) break;
 
         // print progress
-        if (epoch % 1 == 0) {
-            printf("step %zu loss %.2f lr %.2f\n", epoch, cost_data, lr);
+        if (epoch % 2 == 0) {
+            printf("step %zu loss %.2f lr %.2f\n", epoch, cost->data, lr);
             printf("w0: %.2f | grad: %.2f\n", ((rac_var_t*)vt_plist_get(params, 0))->data, ((rac_var_t*)vt_plist_get(params, 0))->grad);
             printf("w1: %.2f | grad: %.2f\n", ((rac_var_t*)vt_plist_get(params, 1))->data, ((rac_var_t*)vt_plist_get(params, 1))->grad);
             printf("b : %.2f | grad: %.2f\n\n", ((rac_var_t*)vt_plist_get(params, 2))->data, ((rac_var_t*)vt_plist_get(params, 2))->grad);
         }
     }
+    
+    /**
+     * TEST:
+    */ 
 
     // test model
     pred = rac_neuron_forward(perceptron, input);
@@ -406,8 +422,11 @@ void test_neuron(void) {
     assert(((rac_var_t*)vt_plist_get(params, 0))->grad == 0);
     assert(((rac_var_t*)vt_plist_get(params, 1))->grad == 0);
 
-    // free only the things you've allocated yourself
-    rac_var_free(loss);
+    /**
+     * FREE: free only the things you've allocated yourself 
+    */
+
+    rac_var_free(cost);
     rac_var_free(target);
     plist_var_free(input);
     rac_neuron_free(perceptron);
@@ -426,7 +445,7 @@ void test_layer(void) {
     rac_layer_free(layer);
 
     /**
-     * FORWARD PROPAGATION
+     * FORWARD PROPAGATION EXAMPLE:
      */
 
     /* --- INIT --- */
