@@ -6,7 +6,12 @@ static int test_num = 0;
 #define TEST(func) { printf("(%d) ---> TESTING: %s\n", test_num, #func); func(); test_num++; }
 
 /**
- * TESTS
+ * TESTS:   These are just tests with debugging information retained. 
+ *          Some information is manually collected in form of 'caches' 
+ *          that you may see in the code. 
+ * 
+ *          Remember: 'caches' are not neccessary and can be left out. 
+ *          It's a tool I use to check for memory allocations and leaks.
  */
 
 void test_var(void);
@@ -33,8 +38,8 @@ int main(void) {
         vt_debug_disable_output(true);
         // TEST(test_var);
         // TEST(test_neuron);
-        TEST(test_layer);
-        // TEST(test_mlp);
+        // TEST(test_layer);
+        TEST(test_mlp);
     }
     vt_mallocator_print_stats(alloctr->stats);
     vt_mallocator_destroy(alloctr);
@@ -492,20 +497,20 @@ void test_layer(void) {
     // loop
     const rac_float lr = 0.005;
     const size_t iters = 100;
-    VT_FOREACH(epoch, 0, iters) {                                                   // pushing to cache is not neccessary,
-        // batch forward                                                            // since allocator will free the memory anyway, 
-        rac_float accuracy = 0;                                                     // but I'd like to free it manually.
-        rac_var_t *loss = rac_var_make(alloctr, 0);                                 vt_plist_push_front(cache, loss);
+    VT_FOREACH(epoch, 0, iters) {                                               // pushing to cache is not neccessary,
+        // batch forward                                                        // since allocator will free the memory anyway, 
+        rac_float accuracy = 0;                                                 // but I'd like to free it manually.
+        rac_var_t *loss = rac_var_make(alloctr, 0);                             vt_plist_push_front(cache, loss);
         VT_FOREACH(i, 0, input_rows) {
             // forward
-            vt_plist_t *x = vt_plist_get(input, i);
-            vt_plist_t *out = rac_layer_forward(layer, x);
-            rac_var_t *yhat = vt_plist_get(out, 0);
-            rac_var_t *ytarget = vt_plist_get(target, i);
+            vt_plist_t *x = vt_plist_get(input, i);                             // get i-th row from input
+            vt_plist_t *out = rac_layer_forward(layer, x);                      // forward model using that input row
+            rac_var_t *yhat = vt_plist_get(out, 0);                             // retreive predicted data
+            rac_var_t *ytarget = vt_plist_get(target, i);                       // get target data
 
             // loss: mse
-            loss = rac_var_sub(yhat, ytarget);                                      vt_plist_push_back(cache, loss);
-            loss = rac_var_mul(loss, loss);                                         vt_plist_push_back(cache, loss);
+            loss = rac_var_sub(yhat, ytarget);                                  vt_plist_push_back(cache, loss);
+            loss = rac_var_mul(loss, loss);                                     vt_plist_push_back(cache, loss);
             loss = rac_var_add(loss, vt_plist_get(cache, 0));
 
             // push loss to front, so I can find it at the 0th index
@@ -514,7 +519,7 @@ void test_layer(void) {
             // accuracy
             accuracy += ((yhat->data > 0.5) == ytarget->data);
         }
-        loss = rac_var_div(loss, batch_size);                                       vt_plist_push_back(cache, loss);
+        loss = rac_var_div(loss, batch_size);                                   vt_plist_push_back(cache, loss);
         accuracy /= input_rows;
 
         // backward
@@ -531,7 +536,7 @@ void test_layer(void) {
     /**
      * FREE: free only the things you've allocated yourself 
     */
-   
+
     // free cache and target lists
     plist_var_free(cache);
     plist_var_free(target);
@@ -582,9 +587,14 @@ void test_mlp(void) {
         0, 1, 0, 1,
     };
     VT_FOREACH(i, 0, input_rows) {
-        vt_plist_t *x = vt_plist_create(input_size, alloctr);
-        VT_FOREACH(j, 0, input_size) vt_plist_push_back(x, rac_var_make(alloctr, data[vt_index_2d_to_1d(i, j, 4)]));
-        vt_plist_push_back(input, x);
+        // create input row and fill with values
+        vt_plist_t *input_row = vt_plist_create(input_size, alloctr);
+        VT_FOREACH(j, 0, input_size) vt_plist_push_back(input_row, rac_var_make(alloctr, data[vt_index_2d_to_1d(i, j, 4)]));
+
+        // append input row to the input list
+        vt_plist_push_back(input, input_row);
+
+        // append target value to target list
         vt_plist_push_back(target, rac_var_make(alloctr, data[vt_index_2d_to_1d(i, 3, 4)]));
     }
     
@@ -595,29 +605,33 @@ void test_mlp(void) {
     rac_var_t *batch_size = rac_var_make(alloctr, input_rows);
 
     /* --- FORWARD --- */
+
     // loop
     const rac_float lr = 0.0005;
     const size_t iters = 100;
-    VT_FOREACH(epoch, 0, iters) {
-        // batch forward
-        rac_float accuracy = 0;
-        rac_var_t *loss = rac_var_make(alloctr, 0); vt_plist_push_front(cache, loss);
+    VT_FOREACH(epoch, 0, iters) {                                               // pushing to cache is not neccessary,
+        // batch forward                                                        // since allocator will free the memory anyway, 
+        rac_float accuracy = 0;                                                 // but I'd like to free it manually.
+        rac_var_t *loss = rac_var_make(alloctr, 0);                             vt_plist_push_front(cache, loss);
         VT_FOREACH(i, 0, input_rows) {
             // forward
-            vt_plist_t *x = vt_plist_get(input, i);
-            vt_plist_t *out = rac_mlp_forward(model, x);
-            rac_var_t *yhat = vt_plist_get(out, 0);
-            rac_var_t *ytarget = vt_plist_get(target, i);
+            vt_plist_t *x = vt_plist_get(input, i);                             // get i-th row from input
+            vt_plist_t *out = rac_mlp_forward(model, x);                        // forward model using that input row
+            rac_var_t *yhat = vt_plist_get(out, 0);                             // retreive predicted data
+            rac_var_t *ytarget = vt_plist_get(target, i);                       // get target data
 
             // loss: mse
-            loss = rac_var_sub(yhat, ytarget); vt_plist_push_back(cache, loss);
-            loss = rac_var_mul(loss, loss); vt_plist_push_back(cache, loss);
-            loss = rac_var_add(loss, vt_plist_get(cache, 0)); vt_plist_push_front(cache, loss);
+            loss = rac_var_sub(yhat, ytarget);                                  vt_plist_push_back(cache, loss);
+            loss = rac_var_mul(loss, loss);                                     vt_plist_push_back(cache, loss);
+            loss = rac_var_add(loss, vt_plist_get(cache, 0)); 
+            
+            // push loss to front, so I can find it at the 0th index
+            vt_plist_push_front(cache, loss);
             
             // accuracy
             accuracy += ((yhat->data > 0.5) == ytarget->data);
         }
-        loss = rac_var_div(loss, batch_size); vt_plist_push_back(cache, loss);
+        loss = rac_var_div(loss, batch_size);                                   vt_plist_push_back(cache, loss);
         accuracy /= input_rows;
 
         // backward
@@ -630,13 +644,25 @@ void test_mlp(void) {
         // output progress
         if (epoch % 10 == 0) printf("epoch %3zu loss %.4f accuracy %.4f\n", epoch, loss->data, accuracy);
     }
+    
+    /**
+     * FREE: free only the things you've allocated yourself 
+    */
 
-    // free
+    // free cache and target lists
     plist_var_free(cache);
     plist_var_free(target);
+
+    // free each input row list
     VT_FOREACH(i, 0, vt_plist_len(input)) plist_var_free(vt_plist_get(input, i));
+
+    // free the input list itself
     vt_plist_destroy(input);
+
+    // free our layer
     rac_mlp_free(model);
+
+    // free batch size variable
     rac_var_free(batch_size);
 }
 
