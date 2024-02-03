@@ -4,8 +4,8 @@ This is a small autograd library made for educational purposes, but works for re
 ## Features
 * [Variable](inc/raccoon/core/variable.h#L25) data type with autograd
 * [Neuron](inc/raccoon/nn/neuron.h#L18) perceptron model
-* To-do: layer
-* To-do: ANN
+* [Layer](inc/raccoon/nn/layer.h#L16)
+* [MLP](inc/raccoon/nn/mlp.h#L17) (multi-layer perceptron)
 
 ## Getting started
 ```sh
