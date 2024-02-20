@@ -4,6 +4,7 @@
 #include "raccoon/core/core.h"
 #include "raccoon/core/version.h"
 #include "raccoon/core/variable.h"
+#include "raccoon/auxiliary/loss.h"
 #include "raccoon/nn/neuron.h"
 #include "raccoon/nn/layer.h"
 #include "raccoon/nn/mlp.h"
