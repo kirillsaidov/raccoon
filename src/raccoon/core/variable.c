@@ -10,19 +10,7 @@ static void rac_var_mul_backward(rac_var_t *const op_result);
 */
 
 rac_var_t *rac_var_make(struct VitaBaseAllocatorType *const alloctr, const rac_float data) {
-    // allocate for variable
-    rac_var_t *var = (alloctr == NULL)
-        ? VT_CALLOC(sizeof(rac_var_t))
-        : VT_ALLOCATOR_ALLOC(alloctr, sizeof(rac_var_t));
-
-    // init
-    *var = (rac_var_t) {
-        .data = data,
-        .grad = 0,
-        .alloctr = alloctr,
-    };
-
-    return var;
+    return rac_var_make_ex(alloctr, data, (rac_var_t*[2]){NULL, NULL}, NULL);
 }
 
 rac_var_t *rac_var_make_ex(struct VitaBaseAllocatorType *const alloctr, const rac_float data, struct RaccoonVariable *parents[2], void (*backward)(struct RaccoonVariable*)) {
