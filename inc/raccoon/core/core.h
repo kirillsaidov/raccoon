@@ -58,7 +58,7 @@
 #endif
 typedef RAC_FLOAT rac_float;
 
-// prisma error codes
+// raccoon error codes
 #define RAC_i_GENERATE_RAC_STATUS(apply) \
     apply(RAC_STATUS_ERROR_IS_NULL)                  /* element wasn't initialized or is NULL */ \
     apply(RAC_STATUS_ERROR_IS_REQUIRED)              /* precondition is required */ \
@@ -70,7 +70,7 @@ typedef RAC_FLOAT rac_float;
     apply(RAC_STATUS_OPERATION_SUCCESS)              /* all good */ \
     apply(RAC_STATUS_COUNT)                          /* number of elements */
 
-// generate prisma error codes
+// generate raccoon error codes
 #define X(a) a,
 enum RaccoonStatus {
     RAC_i_GENERATE_RAC_STATUS(X)
