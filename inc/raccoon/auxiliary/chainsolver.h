@@ -26,9 +26,6 @@
 
 // ChainSolver
 typedef struct ChainSolver {
-    // current solver size
-    size_t chain_size;
-
     // cache for `rac_var_t*`
     vt_plist_t *list;
 
@@ -151,7 +148,7 @@ extern void rac_chainsolver_push_v(rac_chainsolver_t *const solver, const rac_fl
 */
 
 /**
- * @brief  Reset ChainSolver operations (so we can reuse the allocated variables)
+ * @brief  Reset ChainSolver operations (frees cached list)
  * @param  solver ChainSolver instance 
  * @param  var variable instance
  * @returns None

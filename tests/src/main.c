@@ -325,7 +325,6 @@ void test_var(void) {
 void test_chainsolver(void) {
     // allocate, test, free
     rac_chainsolver_t *solver = rac_chainsolver_make_ex(alloctr, 3);
-    assert(solver->chain_size == 1);
     assert(solver->list != NULL);
     assert(vt_plist_len(solver->list) == 1);
     assert(rac_chainsolver_result(solver)->data == 3);
@@ -333,7 +332,6 @@ void test_chainsolver(void) {
 
     // create for testing
     solver = rac_chainsolver_make(alloctr);
-    assert(solver->chain_size == 1);
     assert(solver->list != NULL);
     assert(vt_plist_len(solver->list) == 1);
     assert(rac_chainsolver_result(solver)->data == 0);
@@ -343,7 +341,6 @@ void test_chainsolver(void) {
      */
 
     rac_chainsolver_add(solver, rac_var_make(alloctr, 10));
-    assert(solver->chain_size == 2);
     assert(vt_plist_len(solver->list) == 2);
     assert(rac_chainsolver_result(solver)->data == 10);
 
@@ -352,7 +349,6 @@ void test_chainsolver(void) {
      */
     
     rac_chainsolver_sub_v(solver, 2);
-    assert(solver->chain_size == 3);
     assert(vt_plist_len(solver->list) == 3);
     assert(rac_chainsolver_result(solver)->data == 8);
 
@@ -361,7 +357,6 @@ void test_chainsolver(void) {
      */
     
     rac_chainsolver_mul_v(solver, 2);
-    assert(solver->chain_size == 4);
     assert(vt_plist_len(solver->list) == 4);
     assert(rac_chainsolver_result(solver)->data == 16);
 
@@ -370,7 +365,6 @@ void test_chainsolver(void) {
      */
 
     rac_chainsolver_div_v(solver, 8);
-    assert(solver->chain_size == 5);
     assert(vt_plist_len(solver->list) == 5);
     assert(rac_chainsolver_result(solver)->data == 2);
 
@@ -379,7 +373,6 @@ void test_chainsolver(void) {
      */    
 
     rac_chainsolver_push_v(solver, 10);
-    assert(solver->chain_size == 6);
     assert(vt_plist_len(solver->list) == 6);
     assert(rac_chainsolver_result(solver)->data == 10);
 
@@ -388,8 +381,7 @@ void test_chainsolver(void) {
      */    
 
     rac_chainsolver_reset(solver);
-    assert(solver->chain_size == 1);
-    assert(vt_plist_len(solver->list) == 6);
+    assert(vt_plist_len(solver->list) == 1);
     assert(rac_chainsolver_result(solver)->data == 0);
 
     /**

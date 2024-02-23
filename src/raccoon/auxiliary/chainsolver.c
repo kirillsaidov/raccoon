@@ -123,7 +123,6 @@ void rac_chainsolver_push(rac_chainsolver_t *const solver, rac_var_t *const var)
     VT_DEBUG_ASSERT(var != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
 
     // push back new variable
-    solver->chain_size++;
     vt_plist_push_back(solver->list, var);    
 }
 
@@ -141,13 +140,17 @@ void rac_chainsolver_reset(rac_chainsolver_t *const solver) {
     // check for invalid input
     VT_DEBUG_ASSERT(solver != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
 
-    // reset
-    solver->chain_size = 1;
+    // reset the first variable and free everything else
+    const size_t len = vt_plist_len(solver->list);
+    VT_FOREACH(i, 0, len) {
+        if (i == 0) rac_var_zero_grad(vt_plist_get(solver->list, i));
+        else rac_var_free(vt_plist_pop_get(solver->list));
+    }
 }
 
 rac_var_t *rac_chainsolver_result(const rac_chainsolver_t *const solver) {
     // check for invalid input
     VT_DEBUG_ASSERT(solver != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
-    return vt_plist_get(solver->list, solver->chain_size-1);
+    return vt_plist_get(solver->list, vt_plist_len(solver->list)-1);
 }
 
