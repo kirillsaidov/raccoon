@@ -17,7 +17,7 @@
  * @param  target list of target data
  * @returns rac_float accuracy
  */
-rac_float rac_loss_l2(rac_var_t *loss, const vt_plist_t *const pred, const vt_plist_t *const target);
+extern rac_float rac_loss_l2(rac_var_t *const loss, const vt_plist_t *const pred, const vt_plist_t *const target);
 
 #endif // RACCOON_AUXILIARY_LOSS_H
 

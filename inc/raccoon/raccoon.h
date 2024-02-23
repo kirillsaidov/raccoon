@@ -8,7 +8,6 @@
 #include "raccoon/nn/layer.h"
 #include "raccoon/nn/mlp.h"
 #include "raccoon/auxiliary/loss.h"
-#include "raccoon/auxiliary/chainsolver.h"
 
 #endif // RACCOON_H
 

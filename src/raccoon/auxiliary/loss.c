@@ -17,14 +17,14 @@ rac_float rac_loss_l2(rac_var_t *loss, const vt_plist_t *const pred, const vt_pl
         // calculate loss: mse
         rac_var_t *sub = rac_var_sub(yhat, y);
         rac_var_t *mul = rac_var_mul(sub, sub);
-        loss = rac_var_add(loss, mul);
+        *loss = *rac_var_add(loss, mul);
 
         // calculate accuracy
         accuracy += (yhat->data == y->data);
     }
 
     // adjust for len
-    loss = rac_var_div(loss, rac_var_make(loss->alloctr, len));
+    *loss = *rac_var_div(loss, rac_var_make(loss->alloctr, len));
     return accuracy/len;
 }
 

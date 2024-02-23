@@ -15,7 +15,6 @@ static int test_num = 0;
  */
 
 void test_var(void);
-void test_chainsolver(void);
 void test_neuron(void);
 void test_layer(void);
 void test_mlp(void);
@@ -38,10 +37,9 @@ int main(void) {
     {
         vt_debug_disable_output(true);
         // TEST(test_var);
-        TEST(test_chainsolver);
         // TEST(test_neuron);
         // TEST(test_layer);
-        // TEST(test_mlp);
+        TEST(test_mlp);
     }
     vt_mallocator_print_stats(alloctr->stats);
     vt_mallocator_destroy(alloctr);
@@ -320,80 +318,6 @@ void test_var(void) {
     rac_var_free(e);
     rac_var_free(f);
     rac_var_free(g);
-}
-
-void test_chainsolver(void) {
-    // allocate, test, free
-    rac_chainsolver_t *solver = rac_chainsolver_make_ex(alloctr, 3);
-    assert(solver->list != NULL);
-    assert(vt_plist_len(solver->list) == 1);
-    assert(rac_chainsolver_result(solver)->data == 3);
-    rac_chainsolver_free(solver);
-
-    // create for testing
-    solver = rac_chainsolver_make(alloctr);
-    assert(solver->list != NULL);
-    assert(vt_plist_len(solver->list) == 1);
-    assert(rac_chainsolver_result(solver)->data == 0);
-
-    /**
-     * OPERATION: +
-     */
-
-    rac_chainsolver_add(solver, rac_var_make(alloctr, 10));
-    assert(vt_plist_len(solver->list) == 2);
-    assert(rac_chainsolver_result(solver)->data == 10);
-
-    /**
-     * OPERATION: -
-     */
-    
-    rac_chainsolver_sub_v(solver, 2);
-    assert(vt_plist_len(solver->list) == 3);
-    assert(rac_chainsolver_result(solver)->data == 8);
-
-    /**
-     * OPERATION: *
-     */
-    
-    rac_chainsolver_mul_v(solver, 2);
-    assert(vt_plist_len(solver->list) == 4);
-    assert(rac_chainsolver_result(solver)->data == 16);
-
-    /**
-     * OPERATION: /
-     */
-
-    rac_chainsolver_div_v(solver, 8);
-    assert(vt_plist_len(solver->list) == 5);
-    assert(rac_chainsolver_result(solver)->data == 2);
-
-    /**
-     * OPERATION: push back
-     */    
-
-    rac_chainsolver_push_v(solver, 10);
-    assert(vt_plist_len(solver->list) == 6);
-    assert(rac_chainsolver_result(solver)->data == 10);
-
-    /**
-     * OPERATION: reset
-     */    
-
-    rac_chainsolver_reset(solver);
-    assert(vt_plist_len(solver->list) == 1);
-    assert(rac_chainsolver_result(solver)->data == 0);
-
-    /**
-     * OPERATION: ops after reset
-     */
-
-    //
-
-    // TODO: implement operations after reset, right now it only appends
-    // but must reinitialize variables
-
-    rac_chainsolver_free(solver);
 }
 
 void test_neuron(void) {
