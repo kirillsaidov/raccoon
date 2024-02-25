@@ -35,18 +35,18 @@ typedef struct RaccoonNeuron {
 
 /**
  * @brief  Creates a neuron
- * @param  alloctr allocator instance
- * @param  input_size expected input size
- * @param  activate activation function; if linear use `NULL`
+ * @param alloctr allocator instance
+ * @param input_size expected input size
+ * @param activate activation function; if linear use `NULL`
  * @returns valid `rac_neuron_t*` or asserts on failure
  */
 extern rac_neuron_t *rac_neuron_make(struct VitaBaseAllocatorType *const alloctr, const size_t input_size, rac_var_t *(*activate)(rac_var_t *const));
 
 /**
  * @brief  Creates a neuron, extended
- * @param  alloctr allocator instance
- * @param  params initialized (weights + bias) parameters
- * @param  activate activation function; if linear use `NULL`
+ * @param alloctr allocator instance
+ * @param params initialized (weights + bias) parameters
+ * @param activate activation function; if linear use `NULL`
  * @returns valid `rac_neuron_t*` or asserts on failure
  * 
  * @note neuron frees `params` automatically
@@ -55,7 +55,7 @@ extern rac_neuron_t *rac_neuron_make_ex(struct VitaBaseAllocatorType *const allo
 
 /**
  * @brief  Frees a neuron instance
- * @param  neuron instance
+ * @param neuron instance
  * @returns None
  */
 extern void rac_neuron_free(rac_neuron_t *neuron);
@@ -66,23 +66,23 @@ extern void rac_neuron_free(rac_neuron_t *neuron);
 
 /**
  * @brief  Forward operation
- * @param  neuron instance
- * @param  input ditto
+ * @param neuron instance
+ * @param input ditto
  * @returns valid `rac_var_t*` or asserts on failure
  */
 extern rac_var_t *rac_neuron_forward(rac_neuron_t *const neuron, const vt_plist_t *const input);
 
 /**
  * @brief  Zero all gradients
- * @param  neuron instance
+ * @param neuron instance
  * @returns None
  */
 extern void rac_neuron_zero_grad(rac_neuron_t *const neuron);
 
 /**
  * @brief  Update neuron parameters
- * @param  neuron instance
- * @param  lr learning rate
+ * @param neuron instance
+ * @param lr learning rate
  * @returns None
  */
 extern void rac_neuron_update(rac_neuron_t *const neuron, const rac_float lr);

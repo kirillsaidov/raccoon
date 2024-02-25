@@ -7,6 +7,7 @@
 #include "raccoon/nn/neuron.h"
 #include "raccoon/nn/layer.h"
 #include "raccoon/nn/mlp.h"
+#include "raccoon/auxiliary/tape.h"
 #include "raccoon/auxiliary/loss.h"
 
 #endif // RACCOON_H

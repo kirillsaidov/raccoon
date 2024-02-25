@@ -15,6 +15,7 @@ static int test_num = 0;
  */
 
 void test_var(void);
+void test_tape(void);
 void test_neuron(void);
 void test_layer(void);
 void test_mlp(void);
@@ -37,9 +38,10 @@ int main(void) {
     {
         vt_debug_disable_output(true);
         // TEST(test_var);
+        TEST(test_tape);
         // TEST(test_neuron);
         // TEST(test_layer);
-        TEST(test_mlp);
+        // TEST(test_mlp);
     }
     vt_mallocator_print_stats(alloctr->stats);
     vt_mallocator_destroy(alloctr);
@@ -217,7 +219,7 @@ void test_var(void) {
     rac_var_zero_grad(c);
 
     // remake: reuse 'c'
-    rac_var_remake(a, 10, NULL, NULL);
+    rac_var_remake(a, 10, 0, NULL, NULL);
     assert(a->data == 10);
     assert(a->grad == 0);
     assert(a->parents[0] == NULL && a->parents[1] == NULL);
@@ -251,6 +253,49 @@ void test_var(void) {
     rac_var_free(b);
     rac_var_free(c);
 
+    /**
+     * UPDATE: check how values are updated along the chain
+     */
+
+    a = rac_var_make(alloctr, 9);
+    b = rac_var_make(alloctr, 2);
+
+    // sum: c = a + b 
+    c = rac_var_mul(a, b);
+    assert(c->data == 18);
+    assert(c->grad == 0);
+    assert(c->parents[0] == a && c->parents[1] == b);
+
+    // backward
+    rac_var_backward(c);
+    assert(a->grad == 2);
+    assert(b->grad == 9);
+    assert(c->grad == 1);
+
+    // zero grad
+    rac_var_zero_grad(a);
+    rac_var_zero_grad(b);
+    rac_var_zero_grad(c);
+
+    // change value
+    a->data = 7;
+
+    // update
+    rac_var_update(c);
+    assert(c->data == 14);
+    assert(c->grad == 0);
+    assert(c->parents[0] == a && c->parents[1] == b);
+
+    // backward
+    rac_var_backward(c);
+    assert(a->grad == 2);
+    assert(b->grad == 7);
+    assert(c->grad == 1);
+
+    rac_var_free(a);
+    rac_var_free(b);
+    rac_var_free(c); 
+    
     /**
      * TEST: a more comprehensive example
      */
@@ -318,6 +363,69 @@ void test_var(void) {
     rac_var_free(e);
     rac_var_free(f);
     rac_var_free(g);
+}
+
+void test_tape(void) {
+    // allocate, test, free
+    rac_tape_t *tape = rac_tape_make(alloctr);
+    assert(tape->alloctr == alloctr);
+    assert(vt_plist_len(tape->list) == 0);
+    assert(vt_plist_capacity(tape->list) == VT_ARRAY_DEFAULT_INIT_ELEMENTS);
+    rac_tape_free(tape);
+
+    // create tape
+    tape = rac_tape_make(alloctr);
+
+    /**
+     * PUSH:
+     */
+
+    // vars
+    rac_var_t *a = rac_var_make(alloctr, 2);
+    rac_var_t *b = rac_var_make(alloctr, 3);
+
+    // push
+    rac_tape_push(tape, a);
+    rac_tape_push(tape, b);
+    assert(rac_tape_last(tape) == b);
+
+    rac_tape_push(tape, rac_var_add(rac_tape_last(tape), a));
+    assert(vt_plist_len(tape->list) == 3);
+    assert(vt_plist_capacity(tape->list) == VT_ARRAY_DEFAULT_INIT_ELEMENTS);
+    assert(rac_tape_last(tape)->data == 5);
+    
+    /**
+     * CLEAR:
+     */
+    rac_tape_clear(tape);
+    assert(vt_plist_len(tape->list) == 0);
+    assert(vt_plist_capacity(tape->list) == VT_ARRAY_DEFAULT_INIT_ELEMENTS);
+    assert(rac_tape_last(tape) == NULL);
+
+    /**
+     * UPDATE:
+     */
+
+    // setup
+    a = rac_var_make(alloctr, 5);
+    b = rac_var_make(alloctr, 10);
+    rac_var_t *c = rac_var_make(alloctr, 25);
+    
+    // calculate: e = a * b - c
+    rac_var_t *d = rac_var_mul(a, b);
+    rac_var_t *e = rac_var_sub(d, c);
+    assert(e->data == 25);
+
+    // push to tape
+    rac_tape_push_ex(tape, 5, (rac_var_t*[]){a, b, c, d, e});
+
+    // modify value
+    a->data = 6;
+    rac_tape_update(tape);
+    assert(rac_tape_last(tape)->data == 35);
+
+    // free tape
+    rac_tape_free(tape);
 }
 
 void test_neuron(void) {
