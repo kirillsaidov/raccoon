@@ -3,7 +3,15 @@
 
 /** TAPE MODULE
  * Functions:
-    - 
+    - rac_tape_make 
+    - rac_tape_free 
+    - rac_tape_reset 
+    - rac_tape_update 
+    - rac_tape_push 
+    - rac_tape_push_ex 
+    - rac_tape_last 
+    - rac_tape_compile 
+    - rac_tape_compiled 
 */
 
 #include "raccoon/core/core.h"
@@ -87,6 +95,13 @@ extern rac_var_t *rac_tape_last(const rac_tape_t *const tape);
  * @note Tape can only be reset `rac_tape_reset(tape)` afterwards.
  */
 extern void rac_tape_compile(rac_tape_t *const tape);
+
+/**
+ * @brief Checks if tape is locked
+ * @param tape tape instance
+ * @returns ditto
+ */
+extern bool rac_tape_compiled(const rac_tape_t *const tape);
 
 #endif // RACCOON_AUXILIARY_TAPE_H
 

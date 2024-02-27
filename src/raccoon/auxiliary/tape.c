@@ -100,3 +100,9 @@ void rac_tape_compile(rac_tape_t *const tape) {
     tape->locked = true;
 }
 
+bool rac_tape_compiled(const rac_tape_t *const tape) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(tape != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    return tape->locked;
+}
+
