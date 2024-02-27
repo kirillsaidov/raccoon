@@ -40,7 +40,7 @@ void rac_tape_free(rac_tape_t *tape) {
     Tape operations
 */
 
-void rac_tape_clear(rac_tape_t *const tape) {
+void rac_tape_reset(rac_tape_t *const tape) {
     // check for invalid input
     VT_DEBUG_ASSERT(tape != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     
@@ -49,6 +49,9 @@ void rac_tape_clear(rac_tape_t *const tape) {
     while ((tmp = vt_plist_pop_get(tape->list)) != NULL) {
         rac_var_free(tmp);
     }
+
+    // unlock
+    tape->locked = false;
 }
 
 void rac_tape_update(rac_tape_t *const tape) {
@@ -65,6 +68,7 @@ void rac_tape_update(rac_tape_t *const tape) {
 void rac_tape_push(rac_tape_t *const tape, const rac_var_t *const var) {
     // check for invalid input
     VT_DEBUG_ASSERT(tape != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_ENFORECE(!tape->locked, "%s\n", "Cannot push to the tape! Need to `rac_tape_reset(tape)` first!");
     vt_plist_push_back(tape->list, var);
 }
 
@@ -73,6 +77,7 @@ void rac_tape_push_ex(rac_tape_t *const tape, rac_var_t *arr[], const size_t arr
     VT_DEBUG_ASSERT(tape != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     VT_DEBUG_ASSERT(arr != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     VT_DEBUG_ASSERT(arr_size > 0, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_ENFORECE(!tape->locked, "%s\n", "Cannot push to the tape! Need to `rac_tape_reset(tape)` first!");
 
     // push elements
     VT_FOREACH(i, 0, arr_size) {
@@ -88,3 +93,10 @@ rac_var_t *rac_tape_last(const rac_tape_t *const tape) {
         ? vt_plist_get(tape->list, vt_plist_len(tape->list)-1) 
         : NULL;
 }
+
+void rac_tape_compile(rac_tape_t *const tape) {
+    // check for invalid input
+    VT_DEBUG_ASSERT(tape != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    tape->locked = true;
+}
+

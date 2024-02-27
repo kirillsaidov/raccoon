@@ -397,7 +397,7 @@ void test_tape(void) {
     /**
      * CLEAR:
      */
-    rac_tape_clear(tape);
+    rac_tape_reset(tape);
     assert(vt_plist_len(tape->list) == 0);
     assert(vt_plist_capacity(tape->list) == VT_ARRAY_DEFAULT_INIT_ELEMENTS);
     assert(rac_tape_last(tape) == NULL);

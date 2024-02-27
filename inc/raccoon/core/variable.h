@@ -54,7 +54,7 @@ typedef struct RaccoonVariable {
 */
 
 /**
- * @brief  Creates a variable
+ * @brief Creates a variable
  * @param alloctr allocator instance
  * @param data numerical data
  * @returns valid `rac_var_t*` or asserts on failure
@@ -62,7 +62,7 @@ typedef struct RaccoonVariable {
 extern rac_var_t *rac_var_make(struct VitaBaseAllocatorType *const alloctr, const rac_float data);
 
 /**
- * @brief  Creates a variable, extended
+ * @brief Creates a variable, extended
  * @param alloctr allocator instance
  * @param data numerical data
  * @param op operation `{ +, -, *, / }`
@@ -73,14 +73,14 @@ extern rac_var_t *rac_var_make(struct VitaBaseAllocatorType *const alloctr, cons
 extern rac_var_t *rac_var_make_ex(struct VitaBaseAllocatorType *const alloctr, const rac_float data, const char op, struct RaccoonVariable *parents[2], void (*backward)(struct RaccoonVariable*));
 
 /**
- * @brief  Creates a random variable in range [0; 1)
+ * @brief Creates a random variable in range [0; 1)
  * @param alloctr allocator instance
  * @returns valid `rac_var_t*` or asserts on failure
  */
 extern rac_var_t *rac_var_make_rand(struct VitaBaseAllocatorType *const alloctr);
 
 /**
- * @brief  Reinitializes the variable with new data
+ * @brief Reinitializes the variable with new data
  * @param var variable instance
  * @param data allocator instance
  * @param op operation `{ +, -, *, / }`
@@ -91,7 +91,7 @@ extern rac_var_t *rac_var_make_rand(struct VitaBaseAllocatorType *const alloctr)
 extern void rac_var_remake(rac_var_t *var, const rac_float data, const char op, struct RaccoonVariable *parents[2], void (*backward)(struct RaccoonVariable*));
 
 /**
- * @brief  Frees a variable instance
+ * @brief Frees a variable instance
  * @param var variable instance
  * @returns None
  */
@@ -102,21 +102,21 @@ extern void rac_var_free(rac_var_t *var);
 */
 
 /**
- * @brief  Perform backward propagation
+ * @brief Perform backward propagation
  * @param var variable instance
  * @returns None
  */
 extern void rac_var_backward(rac_var_t *const var);
 
 /**
- * @brief  Zero all gradients
+ * @brief Zero all gradients
  * @param var variable instance
  * @returns None
  */
 extern void rac_var_zero_grad(rac_var_t *const var);
 
 /**
- * @brief  Add two variables
+ * @brief Add two variables
  * @param lhs variable instance
  * @param rhs variable instance
  * @returns valid `rac_var_t*` or asserts on failure
@@ -124,7 +124,7 @@ extern void rac_var_zero_grad(rac_var_t *const var);
 extern rac_var_t *rac_var_add(rac_var_t *const lhs, rac_var_t *const rhs);
 
 /**
- * @brief  Substract two variables
+ * @brief Substract two variables
  * @param lhs variable instance
  * @param rhs variable instance
  * @returns valid `rac_var_t*` or asserts on failure
@@ -132,7 +132,7 @@ extern rac_var_t *rac_var_add(rac_var_t *const lhs, rac_var_t *const rhs);
 extern rac_var_t *rac_var_sub(rac_var_t *const lhs, rac_var_t *const rhs);
 
 /**
- * @brief  Multiply two variables
+ * @brief Multiply two variables
  * @param lhs variable instance
  * @param rhs variable instance
  * @returns valid `rac_var_t*` or asserts on failure
@@ -140,7 +140,7 @@ extern rac_var_t *rac_var_sub(rac_var_t *const lhs, rac_var_t *const rhs);
 extern rac_var_t *rac_var_mul(rac_var_t *const lhs, rac_var_t *const rhs);
 
 /**
- * @brief  Divide two variables
+ * @brief Divide two variables
  * @param rhs variable instance
  * @param lhs variable instance
  * @returns valid `rac_var_t*` or asserts on failure
@@ -148,7 +148,7 @@ extern rac_var_t *rac_var_mul(rac_var_t *const lhs, rac_var_t *const rhs);
 extern rac_var_t *rac_var_div(rac_var_t *const lhs, rac_var_t *const rhs);
 
 /**
- * @brief  Add-inplace two variables
+ * @brief Add-inplace two variables
  * @param out variable instance
  * @param lhs variable instance
  * @param rhs variable instance
@@ -157,7 +157,7 @@ extern rac_var_t *rac_var_div(rac_var_t *const lhs, rac_var_t *const rhs);
 extern void rac_var_add_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs);
 
 /**
- * @brief  Substract-inplace two variables
+ * @brief Substract-inplace two variables
  * @param out variable instance
  * @param lhs variable instance
  * @param rhs variable instance
@@ -166,7 +166,7 @@ extern void rac_var_add_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t 
 extern void rac_var_sub_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs);
 
 /**
- * @brief  Multiply-inplace two variables
+ * @brief Multiply-inplace two variables
  * @param out variable instance
  * @param lhs variable instance
  * @param rhs variable instance
@@ -175,7 +175,7 @@ extern void rac_var_sub_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t 
 extern void rac_var_mul_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs);
 
 /**
- * @brief  Divide-inplace two variables
+ * @brief Divide-inplace two variables
  * @param out variable instance
  * @param lhs variable instance
  * @param rhs variable instance
@@ -184,7 +184,7 @@ extern void rac_var_mul_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t 
 extern void rac_var_div_inplace(rac_var_t *out, rac_var_t *const lhs, rac_var_t *const rhs);
 
 /**
- * @brief  Update variable value from cached `op` and `parents` information
+ * @brief Update variable value from cached `op` and `parents` information
  * @param var variable instance
  * @returns None
  * @note If insufficient information, does nothing.
@@ -197,7 +197,7 @@ extern void rac_var_update(rac_var_t *const var);
 */
 
 /**
- * @brief  Builds parent (dependency) tree
+ * @brief Builds parent (dependency) tree
  * @param node_start start from node
  * @returns a list of parents including the starting node or asserts on failure
  */

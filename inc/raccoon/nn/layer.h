@@ -32,7 +32,7 @@ typedef struct RaccoonLayer {
 */
 
 /**
- * @brief  Creates a layer
+ * @brief Creates a layer
  * @param alloctr allocator instance
  * @param input_size expected input size
  * @param output_size expected input size
@@ -42,7 +42,7 @@ typedef struct RaccoonLayer {
 extern rac_layer_t *rac_layer_make(struct VitaBaseAllocatorType *const alloctr, const size_t input_size, const size_t output_size, rac_var_t *(*activate)(rac_var_t *const));
 
 /**
- * @brief  Frees a layer instance
+ * @brief Frees a layer instance
  * @param layer instance
  * @returns None
  */
@@ -53,7 +53,7 @@ extern void rac_layer_free(rac_layer_t *layer);
 */
 
 /**
- * @brief  Forward operation
+ * @brief Forward operation
  * @param layer instance
  * @param input ditto
  * @returns valid `vt_plist_t*` of `rac_var_t*` or asserts on failure
@@ -61,14 +61,14 @@ extern void rac_layer_free(rac_layer_t *layer);
 extern vt_plist_t *rac_layer_forward(rac_layer_t *const layer, const vt_plist_t *const input);
 
 /**
- * @brief  Zero all gradients
+ * @brief Zero all gradients
  * @param layer instance
  * @returns None
  */
 extern void rac_layer_zero_grad(rac_layer_t *const layer);
 
 /**
- * @brief  Update layer parameters
+ * @brief Update layer parameters
  * @param layer instance
  * @param lr learning rate
  * @returns None

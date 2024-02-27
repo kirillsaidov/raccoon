@@ -211,7 +211,7 @@ vt_plist_t *rac_var_build_parent_tree(rac_var_t *const node_start) {
 // -------------------------- PRIVATE -------------------------- //
 
 /**
- * @brief  Builds parent (dependency) tree
+ * @brief Builds parent (dependency) tree
  * @param node_curr current node
  * @param node_list node list
  * @returns None
@@ -231,7 +231,7 @@ static void rac_var_deep_walk(rac_var_t *const node_curr, vt_plist_t *const node
 }
 
 /**
- * @brief  Performs backward operation on addition and substraction
+ * @brief Performs backward operation on addition and substraction
  * @param op_result addition/substraction operation result
  * @returns None
  */
@@ -249,7 +249,7 @@ static void rac_var_add_backward(rac_var_t *const op_result) {
 }
 
 /**
- * @brief  Performs backward operation on multiplication and division
+ * @brief Performs backward operation on multiplication and division
  * @param op_result multiplication/division operation result
  * @returns None
  */
