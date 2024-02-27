@@ -68,14 +68,15 @@ void rac_tape_push(rac_tape_t *const tape, const rac_var_t *const var) {
     vt_plist_push_back(tape->list, var);
 }
 
-void rac_tape_push_ex(rac_tape_t *const tape, const size_t len, rac_var_t *arr[len]) {
+void rac_tape_push_ex(rac_tape_t *const tape, rac_var_t *arr[], const size_t arr_size) {
     // check for invalid input
     VT_DEBUG_ASSERT(tape != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
-    VT_DEBUG_ASSERT(len > 0, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     VT_DEBUG_ASSERT(arr != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+    VT_DEBUG_ASSERT(arr_size > 0, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
 
     // push elements
-    VT_FOREACH(i, 0, len) {
+    VT_FOREACH(i, 0, arr_size) {
+        VT_ENFORCE(arr[i] != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
         vt_plist_push_back(tape->list, arr[i]);
     }
 }

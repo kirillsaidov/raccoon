@@ -63,11 +63,11 @@ extern void rac_tape_push(rac_tape_t *const tape, const rac_var_t *const var);
 /**
  * @brief  Push multiple elements to the tape
  * @param tape tape instance
- * @param len number of elements to push
  * @param arr array of variables
+ * @param arr_size number of elements to push
  * @returns None
  */
-extern void rac_tape_push_ex(rac_tape_t *const tape, const size_t len, rac_var_t *arr[]);
+extern void rac_tape_push_ex(rac_tape_t *const tape, rac_var_t *arr[], const size_t arr_size);
 
 /**
  * @brief  Retrive last tape value

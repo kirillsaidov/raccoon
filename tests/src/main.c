@@ -37,11 +37,11 @@ int main(void) {
     alloctr = vt_mallocator_create();
     {
         vt_debug_disable_output(true);
-        // TEST(test_var);
+        TEST(test_var);
         TEST(test_tape);
-        // TEST(test_neuron);
-        // TEST(test_layer);
-        // TEST(test_mlp);
+        TEST(test_neuron);
+        TEST(test_layer);
+        TEST(test_mlp);
     }
     vt_mallocator_print_stats(alloctr->stats);
     vt_mallocator_destroy(alloctr);
@@ -417,7 +417,7 @@ void test_tape(void) {
     assert(e->data == 25);
 
     // push to tape
-    rac_tape_push_ex(tape, 5, (rac_var_t*[]){a, b, c, d, e});
+    rac_tape_push_ex(tape, (rac_var_t*[]){a, b, c, d, e}, 5);
 
     // modify value
     a->data = 6;
