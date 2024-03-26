@@ -13,9 +13,13 @@
 
 #include "raccoon/core/core.h"
 #include "raccoon/core/variable.h"
+#include "raccoon/auxiliary/tape.h"
 
 // Neuron with weights + bias (perceptron)
 typedef struct RaccoonNeuron {
+    // tape
+    rac_tape_t *tape;
+
     // model parameters: weights + bias
     vt_plist_t *params;
 

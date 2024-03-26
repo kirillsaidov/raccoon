@@ -108,6 +108,64 @@ rac_var_t *rac_neuron_forward(rac_neuron_t *const neuron, const vt_plist_t *cons
     return result;
 }
 
+// rac_var_t *rac_neuron_forward(rac_neuron_t *const neuron, const vt_plist_t *const input) {
+//     // check for invalid input
+//     VT_DEBUG_ASSERT(neuron != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+//     VT_DEBUG_ASSERT(input != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
+//     VT_ENFORCE(vt_plist_len(input) == vt_plist_len(neuron->params)-1, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INCOMPATIBLE_SHAPES));
+
+//     rac_tape_t *tape = neuron->tape;
+//     if (rac_tape_compiled(tape)) {
+//         // copy over values
+//         const size_t input_size = vt_plist_len(input);
+//         VT_FOREACH(i, 0, input_size) rac_tape_idx(tape, i)->data = ((rac_var_t*)vt_plist_get(neuron->params, i))->data; 
+
+//         // update
+//         rac_tape_update(tape);
+//     } else {        
+//         // copy over values
+//         const size_t input_size = vt_plist_len(input);
+//         VT_FOREACH(i, 0, input_size) rac_tape_push(
+//             tape, 
+//             rac_var_make(neuron->alloctr, ((rac_var_t*)vt_plist_get(neuron->params, i))->data)
+//         );
+
+//         // dummy variable
+//         rac_tape_push(tape, rac_var_make(neuron->alloctr, 0));
+
+//         // forward
+//         VT_FOREACH(i, 0, input_size) {
+//             // calculate product: w * x
+//             rac_var_t *prod = rac_var_mul(vt_plist_get(neuron->params, i), rac_tape_idx(tape, i));
+
+//             // calculate sum: sum + prod
+//             rac_var_t *sum = rac_var_add(rac_tape_last(tape), prod);
+
+//             // add to tape
+//             rac_tape_push(tape, prod);
+//             rac_tape_push(tape, sum);
+//         }
+
+//         // add bias
+//         rac_tape_push(
+//             tape,
+//             rac_var_add(rac_tape_last(tape), vt_plist_get(neuron->params, input_size)) 
+//         );
+
+//         // lock the tape
+//         rac_tape_compile(tape);
+//     }
+
+//     // activate
+//     rac_var_t *result = NULL;
+//     if (neuron->activate) {
+//         result = neuron->activate(rac_tape_last(tape));
+//         vt_plist_push_back(neuron->cache, result);
+//     }
+
+//     return result;
+// }
+
 void rac_neuron_zero_grad(rac_neuron_t *const neuron) {
     // check for invalid input
     VT_DEBUG_ASSERT(neuron != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));

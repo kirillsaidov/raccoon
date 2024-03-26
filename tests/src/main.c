@@ -417,7 +417,7 @@ void test_tape(void) {
     assert(e->data == 25);
 
     // push to tape
-    rac_tape_push_ex(tape, (rac_var_t*[]){a, b, c, d, e}, 5);
+    rac_tape_push_ex(tape, 5, (rac_var_t*[]){a, b, c, d, e});
 
     // modify value
     a->data = 6;

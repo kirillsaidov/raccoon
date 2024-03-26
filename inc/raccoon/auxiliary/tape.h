@@ -75,11 +75,26 @@ extern void rac_tape_push(rac_tape_t *const tape, const rac_var_t *const var);
 /**
  * @brief Push multiple elements to the tape
  * @param tape tape instance
- * @param arr array of variables
  * @param arr_size number of elements to push
+ * @param arr array of variables
  * @returns None
  */
-extern void rac_tape_push_ex(rac_tape_t *const tape, rac_var_t *arr[], const size_t arr_size);
+extern void rac_tape_push_ex(rac_tape_t *const tape, const size_t arr_size, rac_var_t *arr[arr_size]);
+
+/**
+ * @brief Retrive first tape value
+ * @param tape tape instance
+ * @returns valid `rac_var_t*` or NULL if tape length is zero
+ */
+extern rac_var_t *rac_tape_first(const rac_tape_t *const tape);
+
+/**
+ * @brief Retrive `i'th` tape value
+ * @param tape tape instance
+ * @param idx index
+ * @returns valid `rac_var_t*` or NULL if tape length is zero
+ */
+extern rac_var_t *rac_tape_idx(const rac_tape_t *const tape, const size_t idx);
 
 /**
  * @brief Retrive last tape value
@@ -89,7 +104,7 @@ extern void rac_tape_push_ex(rac_tape_t *const tape, rac_var_t *arr[], const siz
 extern rac_var_t *rac_tape_last(const rac_tape_t *const tape);
 
 /**
- * @brief Locks the tape
+ * @brief Compiles (locks) the tape
  * @param tape tape instance
  * @returns None
  * @note Tape can only be reset `rac_tape_reset(tape)` afterwards.
@@ -97,7 +112,7 @@ extern rac_var_t *rac_tape_last(const rac_tape_t *const tape);
 extern void rac_tape_compile(rac_tape_t *const tape);
 
 /**
- * @brief Checks if tape is locked
+ * @brief Checks if tape is compiled (locked)
  * @param tape tape instance
  * @returns ditto
  */
