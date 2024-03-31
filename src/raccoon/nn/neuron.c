@@ -118,7 +118,7 @@ rac_var_t *rac_neuron_forward(rac_neuron_t *const neuron, const vt_plist_t *cons
 //     if (rac_tape_compiled(tape)) {
 //         // copy over values
 //         const size_t input_size = vt_plist_len(input);
-//         VT_FOREACH(i, 0, input_size) rac_tape_idx(tape, i)->data = ((rac_var_t*)vt_plist_get(neuron->params, i))->data; 
+//         VT_FOREACH(i, 0, input_size) rac_tape_get(tape, i)->data = ((rac_var_t*)vt_plist_get(neuron->params, i))->data; 
 
 //         // update
 //         rac_tape_update(tape);
@@ -136,7 +136,7 @@ rac_var_t *rac_neuron_forward(rac_neuron_t *const neuron, const vt_plist_t *cons
 //         // forward
 //         VT_FOREACH(i, 0, input_size) {
 //             // calculate product: w * x
-//             rac_var_t *prod = rac_var_mul(vt_plist_get(neuron->params, i), rac_tape_idx(tape, i));
+//             rac_var_t *prod = rac_var_mul(vt_plist_get(neuron->params, i), rac_tape_get(tape, i));
 
 //             // calculate sum: sum + prod
 //             rac_var_t *sum = rac_var_add(rac_tape_last(tape), prod);

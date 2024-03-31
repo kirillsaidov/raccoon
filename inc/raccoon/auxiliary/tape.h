@@ -94,7 +94,7 @@ extern rac_var_t *rac_tape_first(const rac_tape_t *const tape);
  * @param idx index
  * @returns valid `rac_var_t*` or NULL if tape length is zero
  */
-extern rac_var_t *rac_tape_idx(const rac_tape_t *const tape, const size_t idx);
+extern rac_var_t *rac_tape_get(const rac_tape_t *const tape, const size_t idx);
 
 /**
  * @brief Retrive last tape value

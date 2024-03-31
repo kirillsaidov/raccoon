@@ -94,7 +94,7 @@ rac_var_t *rac_tape_first(const rac_tape_t *const tape) {
         : NULL;
 }
 
-rac_var_t *rac_tape_idx(const rac_tape_t *const tape, const size_t idx) {
+rac_var_t *rac_tape_get(const rac_tape_t *const tape, const size_t idx) {
     // check for invalid input
     VT_DEBUG_ASSERT(tape != NULL, "%s\n", rac_status_to_str(RAC_STATUS_ERROR_INVALID_ARGUMENTS));
     VT_DEBUG_ASSERT(
