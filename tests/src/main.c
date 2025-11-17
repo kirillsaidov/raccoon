@@ -571,7 +571,7 @@ void test_layer(void) {
     vt_plist_t *target = vt_plist_create(input_rows, alloctr);
     
     // define data
-    const rac_float data[input_rows * (input_size+1)] = {
+    const rac_float data[/*input_rows * (input_size+1)*/] = {
         // x     y
         0, 0, 0, 1,
         0, 0, 1, 0,
@@ -683,7 +683,7 @@ void test_mlp(void) {
     vt_plist_t *target = vt_plist_create(input_rows, alloctr);
     
     // define data
-    const rac_float data[input_rows * (input_size+1)] = {
+    const rac_float data[/*input_rows * (input_size+1)*/] = {
         // x     y
         0, 0, 0, 1,
         0, 0, 1, 0,
